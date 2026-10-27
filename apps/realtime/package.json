@@ -1,0 +1,12 @@
+{
+  "name": "@cly/realtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PLACEHOLDER (CLY-010). Reservado para el servidor WebSocket autoritativo (CLY-050). No implementa ningún servicio todavía.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

@@ -1,0 +1,62 @@
+# CI de Proyecto CLY (CLY-010 / CLY-015).
+# ESTADO: escrito pero SIN EJECUTAR todavía (el repositorio aún no está en GitHub).
+# Cubre dominio, tipos, lint, build web y E2E web. NO prueba iOS ni Android: eso requiere
+# builds de desarrollo (EAS) y dispositivos/emuladores (ver docs/MOBILE_RELEASE.md).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # toma la versión de "packageManager" en package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Tipos
+        run: pnpm typecheck
+
+      - name: Tests de dominio y lógica de la app
+        run: pnpm test
+
+      - name: Formato
+        run: pnpm format:check
+
+      - name: Build web
+        run: pnpm build:web
+        env:
+          CI: '1'
+
+      - name: Navegador para E2E
+        run: pnpm --filter @cly/game exec playwright install --with-deps chromium
+
+      - name: E2E web
+        run: pnpm test:e2e
+        env:
+          CI: '1'
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-trace
+          path: apps/game/test-results
+          retention-days: 7

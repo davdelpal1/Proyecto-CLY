@@ -1,0 +1,33 @@
+{
+  "name": "project-cly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Proyecto CLY — videojuego de cifras, letras y duelos (web + iOS + Android). Nombre de trabajo, no marca validada.",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "web": "pnpm --filter @cly/game web",
+    "android": "pnpm --filter @cly/game android",
+    "ios": "pnpm --filter @cly/game ios",
+    "build:web": "pnpm --filter @cly/game export:web",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "pnpm --filter @cly/game test:e2e",
+    "validate": "pnpm lint && pnpm typecheck && pnpm test && pnpm format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.0.0"
+  }
+}

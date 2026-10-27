@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# node_modules plano en lugar del almacén aislado de pnpm. Decisión documentada en README.md:
+# el repositorio puede vivir en rutas muy largas (p. ej. OneDrive en Windows) y el almacén aislado
+# genera rutas de más de 260 caracteres que Node no resuelve. Expo admite este modo
+# (https://docs.expo.dev/guides/monorepos/).
+nodeLinker: hoisted
+
+# pnpm bloquea por defecto los scripts de instalación de dependencias.
+# Solo se autorizan los estrictamente necesarios (revisar antes de añadir más).
+onlyBuiltDependencies:
+  - esbuild

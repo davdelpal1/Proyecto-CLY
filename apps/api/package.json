@@ -1,0 +1,12 @@
+{
+  "name": "@cly/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PLACEHOLDER (CLY-010). Reservado para la API HTTP de Node.js (CLY-013). No implementa ningún servicio todavía.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}
