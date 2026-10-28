@@ -3,7 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { findPuzzleBySlug, isPlayable } from '@cly/game-engine';
 import { newExerciseSeed } from '../../src/adapters/random-seed';
 import { MissingScreen } from '../../src/components/MissingScreen';
-import { TrainingSession } from '../../src/features/training/TrainingSession';
+import { TrainingSession, isTrainable } from '../../src/features/training/TrainingSession';
 
 /**
  * /sesion/entrenamiento?prueba=cifras&reloj=programa|libre&semilla=…&n=…
@@ -23,7 +23,7 @@ export default function Entrenamiento() {
   const [fallbackSeed] = useState(newExerciseSeed);
 
   const puzzle = params.prueba ? findPuzzleBySlug(params.prueba) : undefined;
-  if (!puzzle || !isPlayable(puzzle) || puzzle.type !== 'NUMBER') {
+  if (!puzzle || !isPlayable(puzzle) || !isTrainable(puzzle.type)) {
     return (
       <MissingScreen
         title="Esta prueba aún no se puede jugar"
@@ -42,7 +42,8 @@ export default function Entrenamiento() {
     <>
       <Stack.Screen options={{ title: `${puzzle.title} · Proyecto CLY` }} />
       <TrainingSession
-        key={`${seed}:${attempt}:${timed}`}
+        key={`${puzzle.type}:${seed}:${attempt}:${timed}`}
+        puzzle={puzzle.type}
         seed={seed}
         timed={timed}
         onRepeat={() => router.setParams({ semilla: seed, n: String(attempt + 1) })}

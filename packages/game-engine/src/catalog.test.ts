@@ -37,9 +37,9 @@ describe('registro de pruebas', () => {
     expect(PUZZLE_REGISTRY.filter((p) => p.group === 'DUELS')).toHaveLength(6);
   });
 
-  it('solo La cifra exacta está disponible en esta build; el resto es "En preparación"', () => {
+  it('solo la cifra exacta y la palabra más larga están disponibles en esta build; el resto es "En preparación"', () => {
     const playable = PUZZLE_REGISTRY.filter(isPlayable).map((p) => p.type);
-    expect(playable).toEqual(['NUMBER']);
+    expect(playable).toEqual(['NUMBER', 'LETTERS']);
   });
 
   it('marca 2 para 2 y Esprint numérico como pendientes de verificación (GAME_RULES: alto riesgo)', () => {

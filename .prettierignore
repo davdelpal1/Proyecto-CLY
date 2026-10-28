@@ -9,3 +9,5 @@ apps/game/playwright-report
 # La documentación se mantiene a mano
 *.md
 third_party
+# Datos generados por pnpm lexicon:build
+packages/words-engine/data

@@ -38,6 +38,9 @@ jobs:
       - name: Tests de dominio y lógica de la app
         run: pnpm test
 
+      - name: Léxico al día (el módulo versionado coincide con el diccionario original)
+        run: pnpm lexicon:check
+
       - name: Formato
         run: pnpm format:check
 

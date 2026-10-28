@@ -125,9 +125,9 @@ project-cly/
 | `apps/game` | **Implementado.** Expo SDK 58, Expo Router, React Native Web. Verificado en web; los bundles de Android/iOS compilan, sin ejecutar en dispositivo |
 | `apps/api`, `apps/realtime` | **Placeholders** de una línea; ningún servicio |
 | `packages/numbers-engine` | **Implementado:** AST (`ExpressionTree`), aritmética racional exacta, validador, replay de pasos, solver, generador semillado |
-| `packages/game-engine` | **Parcial:** ruleset + snapshot con hash, RNG semillado, sesión de cifras (acciones/eventos/replay), puntuación de cifras, `PuzzleRegistry` (13), secuencia del concurso, progreso de entrenamiento (`practice-progress.ts`, puro, con parseo defensivo) |
-| `apps/game/src/adapters` | `systemClock` (monotónico), `deviceStorage` (AsyncStorage: localStorage en web), `deviceFeedback` (vibración con `expo-haptics`; no-op en web), `newExerciseSeed`, `epochNowMs` |
-| `packages/words-engine` | **Parcial:** clasificación de formas del diccionario por fiabilidad y filtro de palabras jugables. Falta normalización de fichas y validación de palabras |
+| `packages/game-engine` | **Parcial:** ruleset + snapshot con hash, RNG semillado, sesiones de cifras y de letras (acciones/eventos/replay; el léxico entra como parámetro, igual que el reloj), validador y puntuación de letras, `PuzzleRegistry` (13), secuencia del concurso, progreso de entrenamiento (`practice-progress.ts`, puro, con parseo defensivo) |
+| `apps/game/src/adapters` | `systemClock` (monotónico), `deviceStorage` (AsyncStorage: localStorage en web), `deviceFeedback` (vibración con `expo-haptics`; no-op en web), `newExerciseSeed`, `uiRandom` (azar solo visual), `epochNowMs`, `lexicon` (carga diferida del léxico es-ES) |
+| `packages/words-engine` | **Implementado (provisional):** clasificación por fiabilidad, normalización de fichas (`toTileKey`), multiconjuntos, `parseLexicon` (búsqueda binaria y búsqueda de palabras formables) y los datos generados `data/es-ES.ts`. Falta la capa editorial `allow`/`deny` |
 | `third_party/rla-es/` + `scripts/lexicon/` | Diccionario RLA-ES original (sin modificar, con huellas) y script determinista que genera el léxico (`pnpm lexicon:build`). Ver ADR-005 |
 | `packages/design-tokens` | **Implementado:** color (con test de contraste), tipografía, espaciado, movimiento, breakpoints |
 | `contracts`, `content-schemas`, `test-fixtures`, `testing`, `db/` | **No creados**: se crearán cuando un ticket los necesite (no hay archivos vacíos) |

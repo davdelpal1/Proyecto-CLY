@@ -27,6 +27,7 @@ export default tseslint.config(
       '**/expo-env.d.ts',
       'apps/game/playwright-report/**',
       'apps/game/test-results/**',
+      'packages/words-engine/data/**',
     ],
   },
 

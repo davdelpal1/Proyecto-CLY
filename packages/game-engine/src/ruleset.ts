@@ -1,4 +1,6 @@
 import type { Operator } from '@cly/numbers-engine';
+import { LEXICON_TIERS } from '@cly/words-engine';
+import type { LexiconTier } from '@cly/words-engine';
 import type { DuelType } from './types';
 
 /** Claves de evidencia de GAME_RULES.md §0. */
@@ -72,6 +74,18 @@ export interface Ruleset {
     readonly minAnswerLength: number;
     readonly winnerOnlyScores: boolean;
     readonly bothScoreOnBestTie: boolean;
+    /**
+     * Nivel menos fiable del léxico que se admite (ADR-005). [PENDIENTE]: añadido en la
+     * implementación, ver GAME_RULES.md §1.1. 0–2 admite plurales, conjugaciones y sufijos.
+     */
+    readonly maxLexiconTier: LexiconTier;
+  };
+  /** Bolsa de letras: frecuencias relativas por letra. [DISEÑO]: añadido en la implementación, ver GAME_RULES.md §1.1. */
+  readonly letterTiles: {
+    readonly vowelWeights: Readonly<Record<string, number>>;
+    readonly consonantWeights: Readonly<Record<string, number>>;
+    /** Máximo de fichas iguales en una ronda. */
+    readonly maxCopiesPerLetter: number;
   };
   /** Nivel de evidencia por ruta de campo (`stages.key.durationSeconds`). Lo que no aparece no está contrastado. */
   readonly evidence: Readonly<Record<string, Evidence>>;
@@ -83,7 +97,7 @@ export interface Ruleset {
  */
 export const RTVE_2026_REFERENCE: Ruleset = {
   rulesetId: 'RTVE_2026_REFERENCE',
-  revision: '0.1.1',
+  revision: '0.1.2',
   releaseStatus: 'UNVERIFIED',
   locale: 'es-ES',
   stages: {
@@ -144,6 +158,35 @@ export const RTVE_2026_REFERENCE: Ruleset = {
     minAnswerLength: 5,
     winnerOnlyScores: true,
     bothScoreOnBestTie: true,
+    maxLexiconTier: 'SUFFIX_DERIVATION',
+  },
+  // Frecuencias aproximadas del español escrito (por mil), sin K ni W: no son letras patrimoniales y
+  // casi no forman palabras jugables. Elección de diseño, no del programa.
+  letterTiles: {
+    vowelWeights: { a: 125, e: 137, i: 63, o: 87, u: 39 },
+    consonantWeights: {
+      b: 14,
+      c: 47,
+      d: 59,
+      f: 7,
+      g: 10,
+      h: 7,
+      j: 4,
+      l: 50,
+      m: 31,
+      n: 67,
+      ñ: 3,
+      p: 25,
+      q: 9,
+      r: 69,
+      s: 79,
+      t: 46,
+      v: 10,
+      x: 2,
+      y: 9,
+      z: 5,
+    },
+    maxCopiesPerLetter: 3,
   },
   evidence: {
     'stages.key.durationSeconds': 'RTVE',
@@ -170,6 +213,14 @@ export const RTVE_2026_REFERENCE: Ruleset = {
     'numberScoring.exactPoints': 'SECUNDARIA',
     'numberScoring.closestPoints': 'SECUNDARIA',
     'numberScoring.maxApproxDistance': 'PENDIENTE',
+    'letterRules.tileCount': 'SECUNDARIA',
+    'letterRules.minVowels': 'SECUNDARIA',
+    'letterRules.maxVowels': 'SECUNDARIA',
+    'letterRules.minAnswerLength': 'SECUNDARIA',
+    'letterRules.maxLexiconTier': 'PENDIENTE',
+    'letterTiles.vowelWeights': 'DISEÑO',
+    'letterTiles.consonantWeights': 'DISEÑO',
+    'letterTiles.maxCopiesPerLetter': 'DISEÑO',
   },
 };
 
@@ -184,7 +235,7 @@ export function pendingFields(ruleset: Ruleset, prefix = ''): string[] {
 export function validateRuleset(ruleset: Ruleset): string[] {
   const problems: string[] = [];
   const { classic, duels } = ruleset.stages;
-  const { numberRules, numberTiles, numberScoring } = ruleset;
+  const { numberRules, numberTiles, numberScoring, letterRules, letterTiles } = ruleset;
 
   if (classic.count !== classic.numberRounds + classic.letterRounds) {
     problems.push('stages.classic.count debe ser numberRounds + letterRounds');
@@ -213,6 +264,35 @@ export function validateRuleset(ruleset: Ruleset): string[] {
   }
   if (numberScoring.closestPoints > numberScoring.exactPoints) {
     problems.push('numberScoring.closestPoints no puede superar exactPoints');
+  }
+  if (letterRules.minVowels > letterRules.maxVowels) {
+    problems.push('letterRules.minVowels no puede superar maxVowels');
+  }
+  if (letterRules.maxVowels > letterRules.tileCount) {
+    problems.push('letterRules.maxVowels no puede superar tileCount');
+  }
+  if (letterRules.minAnswerLength > letterRules.tileCount) {
+    problems.push('letterRules.minAnswerLength no puede superar tileCount');
+  }
+  if (!LEXICON_TIERS.includes(letterRules.maxLexiconTier)) {
+    problems.push('letterRules.maxLexiconTier no es un nivel de léxico conocido');
+  }
+  const weights = [
+    ...Object.entries(letterTiles.vowelWeights),
+    ...Object.entries(letterTiles.consonantWeights),
+  ];
+  if (weights.some(([, weight]) => !(weight > 0))) {
+    problems.push('letterTiles: todos los pesos deben ser positivos');
+  }
+  const vowelCapacity =
+    Object.keys(letterTiles.vowelWeights).length * letterTiles.maxCopiesPerLetter;
+  const consonantCapacity =
+    Object.keys(letterTiles.consonantWeights).length * letterTiles.maxCopiesPerLetter;
+  if (
+    vowelCapacity < letterRules.maxVowels ||
+    consonantCapacity < letterRules.tileCount - letterRules.minVowels
+  ) {
+    problems.push('letterTiles.maxCopiesPerLetter es demasiado bajo para repartir las fichas');
   }
   if (ruleset.releaseStatus === 'VERIFIED' && pendingFields(ruleset).length > 0) {
     problems.push('Un ruleset VERIFIED no puede tener campos PENDIENTE');

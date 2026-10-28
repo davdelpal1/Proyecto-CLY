@@ -61,6 +61,51 @@ describe('validateRuleset', () => {
   });
 });
 
+describe('reglas de letras', () => {
+  const withLetters = (
+    letterRules: Partial<Ruleset['letterRules']>,
+    letterTiles: Partial<Ruleset['letterTiles']> = {},
+  ): Ruleset => ({
+    ...RTVE_2026_REFERENCE,
+    letterRules: { ...RTVE_2026_REFERENCE.letterRules, ...letterRules },
+    letterTiles: { ...RTVE_2026_REFERENCE.letterTiles, ...letterTiles },
+  });
+
+  it('el nivel de léxico admitido figura como PENDIENTE y la bolsa como DISEÑO', () => {
+    expect(pendingFields(RTVE_2026_REFERENCE, 'letterRules')).toEqual([
+      'letterRules.maxLexiconTier',
+    ]);
+    expect(RTVE_2026_REFERENCE.evidence['letterTiles.vowelWeights']).toBe('DISEÑO');
+    expect(RTVE_2026_REFERENCE.letterRules.maxLexiconTier).toBe('SUFFIX_DERIVATION');
+  });
+
+  it('detecta rangos de vocales incoherentes', () => {
+    expect(validateRuleset(withLetters({ minVowels: 6, maxVowels: 3 }))[0]).toContain('minVowels');
+    expect(validateRuleset(withLetters({ maxVowels: 11 }))[0]).toContain('maxVowels');
+  });
+
+  it('detecta una respuesta mínima imposible, un nivel inexistente y pesos no positivos', () => {
+    expect(validateRuleset(withLetters({ minAnswerLength: 11 }))[0]).toContain('minAnswerLength');
+    expect(validateRuleset(withLetters({ maxLexiconTier: 'INVENTADO' as never }))[0]).toContain(
+      'maxLexiconTier',
+    );
+    expect(
+      validateRuleset(
+        withLetters(
+          {},
+          { vowelWeights: { ...RTVE_2026_REFERENCE.letterTiles.vowelWeights, a: 0 } },
+        ),
+      )[0],
+    ).toContain('pesos');
+  });
+
+  it('detecta que no se pueden repartir las fichas con tan pocas copias por letra', () => {
+    expect(validateRuleset(withLetters({}, { maxCopiesPerLetter: 1 }))[0]).toContain(
+      'maxCopiesPerLetter',
+    );
+  });
+});
+
 describe('snapshot', () => {
   it('el hash es estable y sensible a cualquier cambio de regla', () => {
     const hash = rulesetSnapshotHash(RTVE_2026_REFERENCE);

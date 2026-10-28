@@ -1,7 +1,7 @@
 # GAME_RULES — Reglamento implementable y verificable
 
-**Versión:** 1.3 — 27/10/2026 (ruleset `RTVE_2026_REFERENCE` rev. 0.1.1; ver §1.1)  
-**Estado:** Perfil de referencia, sujeto a validación audiovisual y jurídica. **Implementado en código solo para La cifra exacta** (`packages/numbers-engine`, `packages/game-engine`).  
+**Versión:** 1.4 — 28/10/2026 (ruleset `RTVE_2026_REFERENCE` rev. 0.1.2; ver §1.1)  
+**Estado:** Perfil de referencia, sujeto a validación audiovisual y jurídica. **Implementado en código solo para La cifra exacta y La palabra más larga** (`packages/numbers-engine`, `packages/words-engine`, `packages/game-engine`).  
 **Regla fundamental:** «Reproducir lo observado» y «publicarlo legalmente» son dos problemas distintos. El motor puede representar reglas del programa; su comercialización exacta exige decidir los derechos de explotación.
 
 El cambio de arquitectura a Expo/React Native no altera tiempos, cálculos, léxico ni puntuaciones: los rulesets son **independientes de plataforma**. Las mismas reglas se aplican a web, iOS y Android, con autoridad en servidor para multijugador.
@@ -17,7 +17,7 @@ El cambio de arquitectura a Expo/React Native no altera tiempos, cálculos, léx
 
 ```yaml
 rulesetId: RTVE_2026_REFERENCE
-revision: 0.1.1 # 0.1.0 + parámetros añadidos en §1.1
+revision: 0.1.2 # 0.1.0 + parámetros añadidos en §1.1
 releaseStatus: UNVERIFIED
 locale: es-ES
 stages:
@@ -59,11 +59,12 @@ letterRules:
   minAnswerLength: 5
   winnerOnlyScores: true
   bothScoreOnBestTie: true
+  maxLexiconTier: SUFFIX_DERIVATION # añadido en 0.1.2, PENDIENTE (ver §1.1)
 ```
 
 Todos estos campos se tiparán en código y tendrán comprobación de consistencia al publicar reglas. Cada partida guarda `rulesetId`, `revision` y un `rulesetSnapshotHash`.
 
-### 1.1 Cambios y decisiones de implementación (rev. 0.1.0 → 0.1.1, 27/10/2026)
+### 1.1 Cambios y decisiones de implementación (rev. 0.1.0 → 0.1.1, 27/10/2026; rev. 0.1.2, 28/10/2026)
 
 El YAML anterior sigue siendo la fuente. Al implementar La cifra exacta fue necesario **añadir parámetros** que el YAML no recogía y **tomar decisiones** que el reglamento no resuelve. Ninguna se presenta como verificada; todas son configurables en `RTVE_2026_REFERENCE` (`packages/game-engine/src/ruleset.ts`) y la interfaz muestra «Reglas provisionales» en la ficha de la prueba.
 
@@ -88,6 +89,24 @@ El YAML anterior sigue siendo la fuente. Al implementar La cifra exacta fue nece
 6. **El entrenamiento nunca otorga puntos.** `scoreNumbersRound` (10/7 con empates, NUM-04/05) existe en el motor para el concurso, pero la práctica individual no lo invoca.
 7. **El generador es solo de entrenamiento:** exige solución exacta, al menos 2 operaciones y que el objetivo no coincida con una ficha. Esto no es una regla del programa.
 8. **Cuenta atrás de 3 s previa a las pruebas con reloj**, con el ejercicio oculto; no consume tiempo de respuesta (UX_FLOWS §6).
+
+**Parámetros añadidos en la rev. 0.1.2 (La palabra más larga, 28/10/2026)**
+
+| Campo | Valor | Evidencia | Motivo |
+|---|---|---|---|
+| `letterRules.maxLexiconTier` | `SUFFIX_DERIVATION` (niveles 0–2 de ADR-005) | [PENDIENTE] | §4 LETTERS deja plurales, flexiones y clíticos sin contrastar. Admite entradas del diccionario, plurales/femeninos/conjugaciones y derivados con sufijo; deja fuera los prefijos (`antiguerra`) y los pronombres pegados (`dámelo`) |
+| `letterTiles.vowelWeights` / `consonantWeights` | frecuencias aproximadas del español escrito; sin K ni W | [DISEÑO] | No consta cómo se reparten las fichas en emisión |
+| `letterTiles.maxCopiesPerLetter` | 3 | [DISEÑO] | Evita repartos como cinco «A» |
+
+**Decisiones de comportamiento (letras)** — todas [DISEÑO] salvo que se indique:
+
+1. **Forma de ficha.** Las tildes y la diéresis no tienen ficha propia (`toTileKey`): «cigüeña» = c-i-g-u-e-ñ-a. La Ñ no equivale a la N. Se muestra la forma canónica del diccionario («PINGÜINO»). Si dos palabras comparten forma de ficha (`canto`/`cantó`) vale la de nivel más fiable.
+2. **Una palabra no válida no cierra la ronda.** Demasiado corta o ausente del diccionario es un «error de forma» (§3.2): se rechaza con su causa y se puede corregir mientras quede tiempo. Consecuencia para online: el rechazo revela si una palabra existe, así que el servidor deberá limitar los intentos (CLY-050).
+3. **Tiempo agotado sin confirmar = sin respuesta**, igual que en cifras: no se envía lo que hubiera a medias.
+4. **Reparto.** El número de vocales se elige al azar entre 3 y 6; el motor admite fijarlo (`vowels`), pero la interfaz aún **no ofrece elegirlo** (la elección de 3–6 vocales «solicitadas» es [SECUNDARIA] y queda pendiente de interfaz). Las letras salen por frecuencia, con 3 copias como máximo.
+5. **El generador solo es de entrenamiento:** exige que exista una palabra de al menos 6 letras (el programa admite 5). No es una regla del programa.
+6. **El entrenamiento nunca otorga puntos.** `scoreLettersRound` (1 punto por letra a la(s) palabra(s) más larga(s), empate ⇒ puntúan todas, LET-04) existe en el motor para el concurso.
+7. **El léxico es una lista ortográfica, no el criterio del programa ni de la RAE** (ADR-005). La interfaz dice «nuestro diccionario». Hay palabras discutibles (conjugaciones raras, derivados poco lexicalizados) y faltan algunas (`ñu`, `vámonos`).
 
 ## 2. Ciclo de una partida
 
@@ -166,6 +185,7 @@ En el modo contra IA, todos los segmentos siguen la misma lógica y la IA única
 - **Políticas lingüísticas:** verbos flexionados, plurales y clíticos se habilitan tras validación lexicográfica; no equivaler diccionario ortográfico con admisión por la RAE.
 - **Puntuación:** elegir máxima longitud validada entre ambos; 1 punto por letra al/los empatado(s) en la mayor longitud; restantes 0.
 - **Pendiente:** palabras compuestas, arcaísmos, regionalismos, acentuación de envío y nombres propios permitidos en clásicas.
+- **Implementación (28/10/2026):** `validateLettersAnswer`, `createLettersRound`, `applyLettersAction` y `scoreLettersRound` en `packages/game-engine`; léxico en `packages/words-engine`. Decisiones en §1.1.
 
 ### THREE_IN_ONE — 3 en 1
 - **Duración:** 30 s [SECUNDARIA].
@@ -235,7 +255,7 @@ En el modo contra IA, todos los segmentos siguen la misma lógica y la IA única
 
 ## 5. Casos de prueba críticos
 
-**Estado de automatización (27/10/2026):** NUM-01 a NUM-05 están cubiertos por tests (`packages/numbers-engine`, `packages/game-engine`; NUM-04/05 en `numbers-scoring.test.ts`). LET, KEY, DUEL, FIN y SP **no están implementados** todavía.
+**Estado de automatización (28/10/2026):** NUM-01 a NUM-05 están cubiertos por tests (`packages/numbers-engine`, `packages/game-engine`; NUM-04/05 en `numbers-scoring.test.ts`). **LET-01 a LET-04** también (`letters-session.test.ts`; LET-03 además en `words-engine`). KEY, DUEL, FIN y SP **no están implementados** todavía.
 
 | Caso | Preparación | Esperado |
 |---|---|---|

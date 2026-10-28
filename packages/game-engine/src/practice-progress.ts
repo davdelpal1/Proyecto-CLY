@@ -1,4 +1,3 @@
-import type { NumbersOutcome } from './numbers-review';
 import { PUZZLE_REGISTRY } from './puzzle-registry';
 import type { PuzzleType } from './types';
 
@@ -37,9 +36,15 @@ export const EMPTY_PUZZLE_STATS: PuzzleStats = {
 
 export const EMPTY_PROGRESS: PracticeProgress = { version: 1, byPuzzle: {}, last: null };
 
+/**
+ * Vocabulario común del progreso: `EXACT` = lo mejor posible (cifra exacta, palabra más larga),
+ * `CLOSE` = válido pero no lo mejor. Cada prueba traduce su propio resultado a este.
+ */
+export type PracticeOutcome = 'EXACT' | 'CLOSE' | 'EXPIRED' | 'GAVE_UP' | 'INVALID';
+
 export interface PracticeResult {
   readonly puzzle: PuzzleType;
-  readonly outcome: NumbersOutcome;
+  readonly outcome: PracticeOutcome;
   readonly elapsedMs: number | null;
   /** Marca de tiempo de calendario (ms desde epoch) aportada por la app; el motor no lee el reloj. */
   readonly atEpochMs: number;

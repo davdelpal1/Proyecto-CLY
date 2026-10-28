@@ -28,10 +28,11 @@ Antigravity se basa en el mismo modelo de editor que VS Code, así que los pasos
 | `pnpm android` / `pnpm ios` | Servidor para móvil. **Sin probar**: Android exige emulador o dispositivo; iOS exige un Mac o una build de EAS |
 | `pnpm lint` | ESLint (incluye reglas de pureza del motor) |
 | `pnpm typecheck` | TypeScript estricto en todo el monorepo |
-| `pnpm test` | Tests unitarios de motor, léxico, tokens y lógica de la app (178) |
-| `pnpm test:e2e` | Tests de navegador con Playwright (54: 27 × escritorio y móvil). Levanta el servidor por sí solo |
+| `pnpm test` | Tests unitarios de motor, léxico, tokens y lógica de la app (253) |
+| `pnpm test:e2e` | Tests de navegador con Playwright (90: 45 × escritorio y móvil). Levanta el servidor por sí solo |
 | `pnpm format` / `pnpm format:check` | Prettier |
-| `pnpm lexicon:build` | Genera el léxico de palabras en `.lexicon-build/` a partir del diccionario de `third_party/rla-es/` (sin red; determinista) |
+| `pnpm lexicon:build` | Genera el léxico de palabras (informes en `.lexicon-build/` y el módulo que carga la app en `packages/words-engine/data/`) a partir del diccionario de `third_party/rla-es/` (sin red; determinista) |
+| `pnpm lexicon:check` | Falla si el módulo del léxico versionado no coincide con lo que generaría `lexicon:build` |
 | `pnpm validate` | `lint` + `typecheck` + `test` + `format:check` |
 | `pnpm build:web` | Exporta la web de producción a `apps/game/dist` |
 
@@ -49,7 +50,7 @@ Variables de entorno: **ninguna es necesaria** en esta fase (`.env.example` solo
 
 **Funciona (verificado en web con Edge):**
 - Portada con **JUEGOS INDIVIDUALES** y **CONCURSO COMPLETO**, sin login.
-- Catálogo con las **13 modalidades**; solo *La cifra exacta* es jugable; las demás aparecen como «En preparación» y su ficha no tiene botón de jugar.
+- Catálogo con las **13 modalidades**; solo *La cifra exacta* y *La palabra más larga* son jugables; las demás aparecen como «En preparación» y su ficha no tiene botón de jugar.
 - Ficha de prueba con cómo se juega, tiempo del programa, reglas provisionales y dos modos: *con tiempo del programa* (cuenta atrás de 3 s y reloj de 0:40) y *sin presión*.
 - **La cifra exacta:** seis fichas y objetivo; operaciones con fichas y resultados encadenables; deshacer y reiniciar; temporizador; confirmar; resultado validado; solución razonada paso a paso; repetir, siguiente ejercicio o volver al catálogo. Teclado físico: `+ − * /`, `Retroceso`, `Esc`, `Enter`.
 - Concurso: elección de modo, configuración contra la IA (nombre, dificultad) y vista previa de las fases derivada del ruleset. **Sin partida.**
@@ -57,7 +58,9 @@ Variables de entorno: **ninguna es necesaria** en esta fase (`.env.example` solo
 - **Progreso local** de entrenamiento (jugadas, exactas, racha, exacto más rápido) en la ficha de la prueba, línea de progreso tras cada ronda y «Seguir practicando» en Inicio. Se guarda solo en el dispositivo, sin cuenta; tolera datos corruptos.
 - **Ajustes:** vibración (móvil; no hace nada en web), estado del movimiento reducido y borrado del progreso con confirmación.
 
-**No existe todavía:** partida de concurso, IA, local/online, la llave, letras, duelos, desempate, final, especiales, perfil, estadísticas globales, audio, backend.
+- **La palabra más larga:** diez letras (3–6 vocales); la palabra se forma tocando fichas o con el teclado físico; se pueden quitar letras, mezclar el atril y confirmar; las palabras no válidas se rechazan sin perder la ronda; el resultado muestra las palabras más largas posibles; repetir, siguiente o volver. **El diccionario es RLA-ES (Hunspell, MPL 1.1), no el de la RAE, y el nivel de palabras admitidas es provisional** (plurales, conjugaciones y sufijos sí; prefijos y pronombres pegados no). La elección del número de vocales aún no está en la interfaz.
+
+**No existe todavía:** partida de concurso, IA, local/online, la llave, duelos, desempate, final, especiales, perfil, estadísticas globales, audio, backend.
 
 **No comprobado:** ejecución en iOS/Android (los bundles JS de ambos compilan con Metro/Hermes, nada más), VoiceOver/TalkBack, Safari/Firefox, la CI remota.
 
@@ -72,8 +75,8 @@ apps/
   realtime/        PLACEHOLDER (sin servicio)
 packages/
   numbers-engine/  AST, validador, aritmética racional exacta, solver, generador semillado
-  game-engine/     ruleset versionado, sesión de cifras reproducible, puntuación, registro de 13 pruebas, secuencia de concurso
-  words-engine/    clasificación del léxico por fiabilidad y filtro de palabras jugables
+  game-engine/     ruleset versionado, sesiones de cifras y de letras reproducibles, puntuación, registro de 13 pruebas, secuencia de concurso
+  words-engine/    léxico es-ES: niveles de fiabilidad, normalización de fichas, búsqueda de palabras formables y datos generados
   design-tokens/   color, tipografía, espaciado, movimiento
 scripts/lexicon/   construcción del léxico (CLY-023)
 third_party/       diccionario RLA-ES original, sin modificar (licencia MPL 1.1)

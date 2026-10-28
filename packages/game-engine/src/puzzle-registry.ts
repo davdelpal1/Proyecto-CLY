@@ -64,9 +64,14 @@ export const PUZZLE_REGISTRY: readonly PuzzleDefinition[] = [
     tagline: 'Forma la palabra más larga con diez letras.',
     howToPlay: [
       'Verás diez letras.',
-      'Forma una palabra de al menos cinco letras usando cada letra como máximo una vez.',
+      'Forma la palabra más larga que puedas. Cada letra se puede usar una sola vez.',
+      'Debe tener al menos cinco letras y estar en nuestro diccionario. Las tildes se ponen solas; la Ñ es una letra aparte.',
+      'Regla provisional: valen plurales, femeninos y conjugaciones. Las palabras con pronombre pegado (dámelo) o con prefijo (antiguerra) no se admiten por ahora.',
+      'Confirma tu palabra antes de que se acabe el tiempo.',
     ],
-    ...inPreparation,
+    availability: 'AVAILABLE',
+    release: 'CORE',
+    ruleStatus: 'PROVISIONAL',
   },
   {
     type: 'KEY',

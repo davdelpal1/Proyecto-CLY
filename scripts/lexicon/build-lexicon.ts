@@ -2,17 +2,21 @@
  * Construye el léxico de juego a partir del diccionario RLA-ES (CLY-023, ADR-005).
  *
  *   node scripts/lexicon/build-lexicon.ts [--out .lexicon-build] [--min 2] [--max 10]
+ *                                         [--module packages/words-engine/data/es-ES.ts] [--check]
  *
  * 1. Verifica las huellas SHA-256 de `third_party/rla-es/` (nada de red: los originales están en el repo).
  * 2. Expande las reglas de afijos de Hunspell a todas las formas.
  * 3. Descarta lo que no es jugable (mayúsculas, guiones, longitud fuera de rango).
  * 4. Asigna a cada palabra el nivel de fiabilidad de su ruta de derivación más fiable.
  * 5. Escribe `es-ES.lexicon.tsv`, `report.json` y `NOTICE.txt`. Es determinista: sin fechas ni azar.
+ * 6. Con `--module`, escribe además el léxico de juego (una línea por forma de ficha, ver
+ *    `lexicon-text.ts`) como módulo TypeScript que la app carga. Con `--check` no escribe nada:
+ *    falla si el módulo existente no coincide con lo que se generaría (para CI).
  *
  * Requiere Node ≥ 22.18 (ejecuta TypeScript directamente).
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -26,6 +30,8 @@ import {
   tierRank,
 } from '../../packages/words-engine/src/lexicon-tiers.ts';
 import type { LexiconTier } from '../../packages/words-engine/src/lexicon-tiers.ts';
+import { buildLexiconText } from '../../packages/words-engine/src/lexicon-text.ts';
+import { toTileKey } from '../../packages/words-engine/src/tile-letters.ts';
 
 interface Sources {
   name: string;
@@ -47,6 +53,9 @@ function option(name: string): string | undefined {
 }
 
 const outDir = resolve(root, option('--out') ?? '.lexicon-build');
+const modulePath =
+  option('--module') === undefined ? null : resolve(root, option('--module') as string);
+const checkOnly = process.argv.includes('--check');
 const minLength = Number(option('--min') ?? 2);
 const maxLength = Number(option('--max') ?? 10);
 if (
@@ -181,16 +190,65 @@ MODIFICACIONES (MPL 1.1 §3.3), realizadas el ${sources.retrievedOn} por Proyect
     (${LEXICON_TIERS.map((tier, rank) => `${rank}=${tier}`).join(', ')}).
 Fuente de la transformación: scripts/lexicon/build-lexicon.ts y packages/words-engine/src/lexicon-tiers.ts.
 
-Formato: una palabra por línea, "palabra<TAB>nivel", ordenadas.
+Formato de es-ES.lexicon.tsv: una palabra por línea, "palabra<TAB>nivel", ordenadas.
+Formato de es-ES.game-lexicon.txt (y del módulo que carga la app): una línea por forma de ficha (sin
+tildes ni diéresis), "clave<TAB>nivel[<TAB>palabra]" — ver packages/words-engine/src/lexicon-text.ts.
 
 Este léxico NO es el del Diccionario de la lengua española de la RAE ni el criterio de ningún programa de
 televisión: es una lista de formas ortográficamente válidas según RLA-ES. Ver docs/ADR/ADR-005-LEXICO.md.
 `;
 
+// Léxico de juego: una línea por forma de ficha (lo que carga la app).
+const game = buildLexiconText(
+  words.map((word) => ({ word, rank: tierRank(best.get(word) as LexiconTier) })),
+  toTileKey,
+);
+const gameSha = sha256(game.text);
+const lexiconId = `rla-es-${sources.version}-${sources.commit.slice(0, 7)}-${gameSha.slice(0, 8)}`;
+
+const moduleSource = `/**
+ * GENERADO por scripts/lexicon/build-lexicon.ts (pnpm lexicon:build). No editar a mano.
+ *
+ * Léxico de juego derivado del diccionario ortográfico RLA-ES (${sources.variant}, v${sources.version}),
+ * licencia ${sources.licenseChosen}. Ver third_party/rla-es/ y docs/ADR/ADR-005-LEXICO.md.
+ * Formato: ver packages/words-engine/src/lexicon-text.ts. No es el léxico de la RAE.
+ */
+
+/** Identifica el contenido exacto: se guarda con cada partida para poder reproducirla. */
+export const ES_LEXICON_ID = ${JSON.stringify(lexiconId)};
+
+/** Número de formas de ficha (líneas) de ${minLength} a ${maxLength} letras. */
+export const ES_LEXICON_SIZE = ${game.count};
+
+export const ES_LEXICON_TEXT = ${JSON.stringify(game.text)};
+`;
+
+if (checkOnly) {
+  if (modulePath === null) throw new Error('--check necesita --module');
+  const current = existsSync(modulePath) ? readFileSync(modulePath, 'utf8') : null;
+  if (current !== moduleSource) {
+    console.error(
+      `${modulePath} no coincide con el léxico que se generaría ahora. Ejecuta «pnpm lexicon:build» y súbelo.`,
+    );
+    process.exit(1);
+  }
+  console.log(`El módulo del léxico está al día (${lexiconId}).`);
+  process.exit(process.exitCode ?? 0);
+}
+
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'es-ES.lexicon.tsv'), lexicon);
-writeFileSync(join(outDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+writeFileSync(join(outDir, 'es-ES.game-lexicon.txt'), game.text);
+writeFileSync(
+  join(outDir, 'report.json'),
+  `${JSON.stringify(report, null, 2)}
+`,
+);
 writeFileSync(join(outDir, 'NOTICE.txt'), notice);
+if (modulePath !== null) {
+  mkdirSync(dirname(modulePath), { recursive: true });
+  writeFileSync(modulePath, moduleSource);
+}
 
 console.log(`Léxico escrito en ${outDir}`);
 console.log(
@@ -208,3 +266,5 @@ for (const row of cumulative) {
   );
 }
 console.log(`  sha256 del léxico: ${report.output.sha256}`);
+console.log(`  léxico de juego: ${game.count} formas de ficha · ${lexiconId}`);
+if (modulePath !== null) console.log(`  módulo escrito en ${modulePath}`);

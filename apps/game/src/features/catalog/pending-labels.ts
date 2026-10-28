@@ -5,6 +5,8 @@ const PENDING_LABELS: Readonly<Record<string, string>> = {
   'numberRules.requireExactDivision': 'Las divisiones deben ser exactas.',
   'numberScoring.maxApproxDistance':
     'Hasta qué distancia del objetivo sigue puntuando una aproximación (solo afecta al concurso).',
+  'letterRules.maxLexiconTier':
+    'Qué formas de palabra valen: aquí se admiten plurales, femeninos, conjugaciones y derivados con sufijo. Las palabras con pronombre pegado (dámelo) o prefijo (antiguerra) quedan fuera hasta contrastarlo con el programa.',
 };
 
 export const describePendingField = (path: string): string => PENDING_LABELS[path] ?? path;

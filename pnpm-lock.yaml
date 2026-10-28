@@ -49,6 +49,9 @@ importers:
       '@cly/numbers-engine':
         specifier: workspace:*
         version: link:../../packages/numbers-engine
+      '@cly/words-engine':
+        specifier: workspace:*
+        version: link:../../packages/words-engine
       '@expo/log-box':
         specifier: ~58.0.13
         version: 58.0.13(@expo/dom-webview@58.0.2)(expo@58.0.19)(react-native@0.88.0(@babel/core@7.29.7)(@react-native/metro-config@0.88.0(@babel/core@7.29.7))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)
@@ -117,6 +120,9 @@ importers:
       '@cly/numbers-engine':
         specifier: workspace:*
         version: link:../numbers-engine
+      '@cly/words-engine':
+        specifier: workspace:*
+        version: link:../words-engine
 
   packages/numbers-engine: {}
 

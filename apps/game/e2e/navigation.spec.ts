@@ -26,7 +26,7 @@ test.describe('Inicio y navegación (CLY-017)', () => {
     }
   });
 
-  test('el catálogo muestra las 13 modalidades y solo la cifra exacta es jugable', async ({
+  test('el catálogo muestra las 13 modalidades y solo la cifra exacta y la palabra más larga son jugables', async ({
     page,
   }) => {
     await page.goto('/juegos');
@@ -47,22 +47,22 @@ test.describe('Inicio y navegación (CLY-017)', () => {
     ];
     for (const slug of slugs) await expect(page.getByTestId(`card-${slug}`)).toBeVisible();
 
-    await expect(page.getByText('JUGAR ›')).toHaveCount(1);
-    await expect(page.getByText('Disponible', { exact: true })).toHaveCount(1);
-    await expect(page.getByText(/En preparación/)).toHaveCount(12);
+    await expect(page.getByText('JUGAR ›')).toHaveCount(2);
+    await expect(page.getByText('Disponible', { exact: true })).toHaveCount(2);
+    await expect(page.getByText(/En preparación/)).toHaveCount(11);
   });
 
   test('una prueba en preparación muestra su ficha sin botones de jugar', async ({ page }) => {
     await page.goto('/juegos');
-    await page.getByTestId('card-letras').click();
-    await expect(page.getByRole('heading', { name: 'La palabra más larga' }).first()).toBeVisible();
+    await page.getByTestId('card-llave').click();
+    await expect(page.getByRole('heading', { name: 'La llave' }).first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'En preparación' })).toBeVisible();
     await expect(page.getByTestId('play-timed')).toHaveCount(0);
     await expect(page.getByTestId('play-untimed')).toHaveCount(0);
   });
 
   test('una URL de sesión de una prueba no disponible no simula jugarla', async ({ page }) => {
-    await page.goto('/sesion/entrenamiento?prueba=letras&reloj=libre&semilla=x');
+    await page.goto('/sesion/entrenamiento?prueba=llave&reloj=libre&semilla=x');
     await expect(page.getByText('Esta prueba aún no se puede jugar')).toBeVisible();
     await expect(page.getByTestId('confirm')).toHaveCount(0);
   });

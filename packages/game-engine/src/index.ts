@@ -40,7 +40,44 @@ export {
   recordPracticeResult,
   serializePracticeProgress,
 } from './practice-progress';
-export type { PracticeProgress, PracticeResult, PuzzleStats } from './practice-progress';
+export type {
+  PracticeOutcome,
+  PracticeProgress,
+  PracticeResult,
+  PuzzleStats,
+} from './practice-progress';
+export { shuffled } from './shuffle';
+export { createLettersRound, solveLetters, tileLetters } from './letters-round';
+export type {
+  GeneratedLettersPuzzle,
+  LettersGeneratorOptions,
+  LettersPuzzle,
+  LettersSolution,
+  LettersTile,
+} from './letters-round';
+export { validateLettersAnswer } from './letters-validation';
+export type { LettersErrorCode, LettersValidation } from './letters-validation';
+export {
+  applyLettersAction,
+  createLettersSession,
+  draftLetters,
+  reduceLettersEvent,
+  replayLettersEvents,
+} from './letters-session';
+export type {
+  LettersAction,
+  LettersApplyResult,
+  LettersEvent,
+  LettersRejection,
+  LettersRejectionCode,
+  LettersRoundResult,
+  LettersSessionConfig,
+  LettersSessionState,
+} from './letters-session';
+export { buildLettersReview, practiceOutcomeOfLetters } from './letters-review';
+export type { LettersOutcome, LettersReview, ReviewedWord } from './letters-review';
+export { scoreLettersRound } from './letters-scoring';
+export type { LettersAward, ValidatedLettersAnswer } from './letters-scoring';
 export {
   PUZZLE_GROUPS,
   PUZZLE_REGISTRY,

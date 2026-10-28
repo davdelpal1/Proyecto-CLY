@@ -48,7 +48,9 @@ export default function FichaPrueba() {
           ...pendingFields(ACTIVE_RULESET, 'numberRules'),
           ...pendingFields(ACTIVE_RULESET, 'numberScoring'),
         ]
-      : [];
+      : puzzle.type === 'LETTERS'
+        ? pendingFields(ACTIVE_RULESET, 'letterRules')
+        : [];
 
   const sessionHref = (clock: 'programa' | 'libre') =>
     ({

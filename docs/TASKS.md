@@ -1,9 +1,9 @@
 # TASKS — Backlog ejecutable (Trello / GitHub Projects)
 
-**Versión:** 1.3 — 27/10/2026  
+**Versión:** 1.4 — 28/10/2026  
 **Convención:** `CLY-xxx`, prioridad `P0/P1/P2`, estado inicial `TODO`. Cada épica puede convertirse en lista de Trello y cada subtarea en checklist.
 
-## Estado real del Sprint 1 (actualizado 27/10/2026, tras probar en móvil y añadir progreso/ajustes)
+## Estado real del Sprint 1 (actualizado 28/10/2026, tras añadir La palabra más larga)
 
 `[x]` = hecho y verificado con los comandos indicados · `[ ]` = pendiente. Las notas entre paréntesis dicen qué falta o qué no se ha podido comprobar.
 
@@ -11,19 +11,20 @@
 |---|---|---|
 | CLY-010 | **Hecho en web** | Monorepo pnpm + Expo SDK 58. Build nativa EAS **no** hecha |
 | CLY-011 | Parcial | Tipos, ruleset versionado + snapshot, sesión de cifras con replay. Falta FSM completa y parser Zod |
-| CLY-012 | Parcial | Tokens + componentes base. Faltan pulsador y ficha de letra |
+| CLY-012 | Parcial | Tokens + componentes base, incluida la ficha de letra. Falta el pulsador |
 | CLY-014 | Parcial | Rutas (incluidos `/ajustes`) y `app.config.ts`. Probado a mano en móvil con Expo Go. Faltan builds EAS y sala |
 | CLY-015 | Parcial | Vitest + Playwright web. Faltan RNTL, E2E nativo y ADR-009 |
 | CLY-016 | Parcial | `Clock`, `StorageAdapter`, `FeedbackAdapter` (vibración) + reglas ESLint de pureza. Falta `NetworkStatusAdapter` y sonido |
 | CLY-017 | **Hecho** | Inicio, catálogo de 13 pruebas, ficha, E2E |
-| CLY-018 | Parcial | `TrainingSession` + resultado + Repetir/Siguiente/Volver (solo Cifras) |
+| CLY-018 | Parcial | `TrainingSession` + resultado + Repetir/Siguiente/Volver (Cifras y La palabra más larga) |
 | CLY-019 | Parcial | Configuración contra IA + vista previa de fases. Sin partida |
 | CLY-020 | **Hecho** | AST, validador, errores tipados, sin `eval` |
 | CLY-021 | Parcial | Solver y generador semillado. Faltan métricas finas y benchmark |
 | CLY-022 | Parcial | Pantalla de cifra exacta jugable. Falta la prueba humana de 20 casos |
-| CLY-023 | **Parcial (provisional)** | Léxico RLA-ES (Hunspell, MPL 1.1) compilado con niveles de fiabilidad: ADR-005. Falta normalización de fichas, lista editorial y revisión jurídica |
+| CLY-023 | **Parcial (provisional)** | Léxico RLA-ES (Hunspell, MPL 1.1) con niveles de fiabilidad, normalización de fichas y búsqueda de palabras formables: ADR-005. Falta lista editorial y revisión jurídica |
+| CLY-024 | **Parcial (provisional)** | La palabra más larga jugable en web: reparto, validación, sesión con replay, puntuación de concurso, pantalla y E2E. Falta la elección de vocales en la interfaz y la prueba humana |
 
-**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 178 tests unitarios + formato) y `pnpm test:e2e` (54 tests Playwright en Edge, viewports 1280×800 y 390×844). El bundle de producción web, el de Android y el de iOS compilan con Metro/Hermes; esto **no** equivale a ejecutarlos en un dispositivo.
+**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 253 tests unitarios + formato), `pnpm lexicon:check` y `pnpm test:e2e` (90 tests Playwright en Edge = 45 × viewports 1280×800 y 390×844). El bundle de producción web (el léxico va en un *chunk* aparte de 5,2 MB), el de Android y el de iOS (~11 MB de Hermes cada uno) compilan con Metro; esto **no** equivale a ejecutarlos en un dispositivo, y **no se ha medido** el tiempo de carga del léxico ni la memoria en un móvil.
 **No comprobado:** ejecución en iOS/Android (ni emulador ni dispositivo), TalkBack/VoiceOver, CI remota (el workflow está escrito pero no se ha ejecutado), Safari y Firefox.
 
 ## ÉPICA 00 — Formato, negocio y derechos [P0 | Sprint 0]
@@ -75,7 +76,7 @@
 
 ### CLY-012 — Diseño base
 - [x] Crear tokens de color, tipografía, radio, espaciado y componentes. (`packages/design-tokens`, con test de contraste WCAG AA de la paleta)
-- [ ] Cronómetro ✅, marcadores ✅, botones de pulsador ❌, fichas numéricas ✅ / letras ❌. (`Countdown`, `ScoreBoard`, `NumberTile`)
+- [ ] Cronómetro ✅, marcadores ✅, botones de pulsador ❌, fichas numéricas ✅ / letras ✅. (`Countdown`, `ScoreBoard`, `NumberTile`, `LetterTile`)
 - [ ] Layout móvil/tablet/escritorio ✅ (verificado en web), safe areas (implementadas con `react-native-safe-area-context`, **sin probar en dispositivo**), teclado virtual (sin campos críticos aún), teclado hardware ✅ (atajos + foco con Tab), foco ✅, lector de pantalla (roles y etiquetas `aria-*` implementados; **sin probar con VoiceOver/TalkBack**).
 - [x] Usar primitives React Native, no `shadcn/ui` DOM como base.
 - [ ] Alinear componentes con `docs/DESIGN.md` y `docs/UX_FLOWS.md`: tarjetas de modo ✅, catálogo ✅, resultado individual ✅, **transiciones de concurso ❌**.
@@ -96,7 +97,7 @@
 - **Aceptación:** misma pantalla Expo funcional en web ✅; **en móvil** probada a mano por el responsable con Expo Go (27/10/2026: «todo bien»; falta anotar modelo y sistema operativo); Android ❌ e iOS ❌ como builds de desarrollo EAS (bloqueo externo documentado arriba; plan: abrir cuenta EAS → `eas build --profile development` → probar `Inicio → Juegos → Cifras`).
 
 ### CLY-015 — Pruebas cross-platform automatizadas [P0 | Sprint 1]
-- [ ] Vitest para motor ✅ (147 tests de paquetes + 16 de la app), React Native Testing Library ❌, Playwright para web ✅ (54 tests = 27 × {escritorio, móvil}).
+- [ ] Vitest para motor ✅ (234 tests de paquetes + 19 de la app), React Native Testing Library ❌, Playwright para web ✅ (90 tests = 45 × {escritorio, móvil}).
 - [ ] Elegir estrategia Maestro/Detox en ADR-009 ❌; smoke test nativo de lanzamiento y navegación ❌.
 - [ ] Pruebas de layout con safe area, teclado abierto y texto grande ❌.
 - [ ] CI con pruebas de dominio/UI y build web ✅ (escrito, sin ejecutar); plan de builds nativas periódicas ❌.
@@ -112,12 +113,12 @@
 - [x] Inicio con dos CTAs dominantes **Juegos individuales** y **Concurso completo**; accesos secundarios a perfil/ajustes/online. (los secundarios, «Con amigos» y «Estadísticas», salen como no interactivos «En preparación»; no hay perfil ni ajustes)
 - [x] Catálogo agrupado con **13 tipos previstos**, de los que 11 son habituales (incluye desempate) y 2 especiales.
 - [x] Ficha de prueba: descripción, cómo se juega, tiempo con/sin reloj, dificultad si está soportada (no se muestra selector: ningún banco la soporta aún) y estado real de disponibilidad.
-- [x] Reutilizar `PuzzleRegistry` y no hardcodear pantallas ficticiamente jugables. (`puzzle-registry.ts`; solo `NUMBER` está `AVAILABLE`)
+- [x] Reutilizar `PuzzleRegistry` y no hardcodear pantallas ficticiamente jugables. (`puzzle-registry.ts`; solo `NUMBER` y `LETTERS` están `AVAILABLE`)
 - [x] Test E2E: abrir Inicio → Juegos → Cifras; Inicio → Concurso → IA; no requerir cuenta.
 - **Aceptación:** la estructura de dos modos resulta inequívoca en web ✅ (sin prueba de usabilidad con 5 personas todavía); iOS/Android sin comprobar; las pruebas aún no implementadas se etiquetan «En preparación» ✅.
 
 ### CLY-018 — Shell de entrenamiento independiente [P0 | Sprint 2]
-- [x] `TrainingShell` sin marcador rival, con reloj opcional y motor común. (`features/training/TrainingSession.tsx`; hoy solo aloja Cifras)
+- [x] `TrainingShell` sin marcador rival, con reloj opcional y motor común. (`features/training/TrainingSession.tsx` despacha a `NumbersTraining` y `LettersTraining`, que comparten `TrainingFrame` y la cuenta atrás `useGetReady`)
 - [x] Pantalla de resultados individual con respuesta explicada tras cierre, `Repetir`, `Siguiente ejercicio`, `Volver a juegos`. (es un estado de la pantalla de sesión, no la ruta `/resultado/entrenamiento`: ver `UX_FLOWS.md`)
 - [x] Configuración de práctica no cambia puntuación ni reglas de concurso. (`TimingConfig` es una variación explícita de la sesión; el ruleset es inmutable)
 - [x] Un mismo puzzle funciona con los validadores del concurso sin lógica duplicada. (`validateExpression` y `scoreNumbersRound` son los que usará el concurso)
@@ -153,18 +154,18 @@
 - **Aceptación:** usuario resuelve/corrige/termina 20 casos sin bloqueo ❌ **pendiente de prueba humana**. Cubierto hoy por E2E (10 semillas distintas, 2 viewports): una resolución exacta de principio a fin con el solver, una aproximación, deshacer/reiniciar, rechazo de división no exacta y de resta no positiva, rendición, repetir/siguiente/volver, cuenta atrás y agotamiento de tiempo.
 
 ### CLY-023 — Léxico y licencias
-- [x] Seleccionar fuente léxica permisible; documentar licencia y atribución. (RLA-ES es_ES v2.9 bajo MPL 1.1; `docs/ADR/ADR-005-LEXICO.md`, `third_party/rla-es/`. **Provisional**: pendiente de revisión jurídica (CLY-071) y de verificar el origen de las palabras. No hay API oficial de la RAE)
-- [ ] Construir normalización Unicode, tildes, ñ, plural y morfología. (morfología ✅: `pnpm lexicon:build` expande los afijos de Hunspell; normalización para fichas ❌)
+- [x] Seleccionar fuente léxica permisible; documentar licencia y atribución. (la atribución MPL se muestra en Ajustes → «Créditos y licencias») (RLA-ES es_ES v2.9 bajo MPL 1.1; `docs/ADR/ADR-005-LEXICO.md`, `third_party/rla-es/`. **Provisional**: pendiente de revisión jurídica (CLY-071) y de verificar el origen de las palabras. No hay API oficial de la RAE)
+- [x] Construir normalización Unicode, tildes, ñ, plural y morfología. (morfología: `pnpm lexicon:build` expande los afijos de Hunspell; fichas: `toTileKey` pliega tildes y diéresis sin `String.normalize`, la Ñ se conserva; `buildLexiconText`/`parseLexicon` indexan por forma de ficha: 321 922 formas de 2–10 letras en `packages/words-engine/data/es-ES.ts`, generado y comprobable con `pnpm lexicon:check`)
 - [ ] Separar palabra candidata de aceptación editorial. (candidata ✅ con 5 niveles de fiabilidad por palabra; la capa editorial `allow`/`deny` ❌, y es necesaria: `ñu`, `vámonos` y `cómpralo` no están en el diccionario)
-- [ ] Escribir test de formas raras/ambiguas. (15 tests de clasificación y filtro con datos sintéticos; faltan casos de formas ambiguas reales)
+- [ ] Escribir test de formas raras/ambiguas. (15 tests de clasificación + 29 de léxico, normalización y búsqueda, incluida la Ñ frente a la N y comprobaciones puntuales sobre el léxico real; faltan casos de formas ambiguas reales y una medida de cobertura frente a emisiones)
 - **Aceptación:** no se copia un diccionario protegido sin autorización ✅ (RLA-ES es de licencia abierta; no se usa ni se raspa el DLE).
 
 ### CLY-024 — Motor y pantalla de letras
-- [ ] Distribución de 10 fichas con elección de 3–6 vocales.
-- [ ] Multiconjuntos y duplicados; mínimo de cinco letras.
-- [ ] Envío de palabra y ganador/puntuación por longitud.
-- [ ] Solución y otras palabras solo al terminar; `Siguiente ejercicio` disponible en el modo individual.
-- **Aceptación:** comparaciones y empate sin errores.
+- [ ] Distribución de 10 fichas con elección de 3–6 vocales. (reparto semillado con 3–6 vocales al azar ✅, el motor admite fijarlas con `vowels`; **la interfaz aún no deja elegirlas** ❌)
+- [x] Multiconjuntos y duplicados; mínimo de cinco letras. (`validateLettersAnswer`: LET-01, LET-02, LET-03)
+- [x] Envío de palabra y ganador/puntuación por longitud. (`scoreLettersRound`, LET-04; el entrenamiento no puntúa)
+- [x] Solución y otras palabras solo al terminar; `Siguiente ejercicio` disponible en el modo individual. (`buildLettersReview` lanza si la ronda no ha terminado; E2E comprueba que la solución no existe en pantalla mientras se juega)
+- **Aceptación:** comparaciones y empate sin errores ✅ en tests de motor; la prueba humana de 20 ejercicios ❌ **pendiente**. Cubierto hoy por 27 tests de sesión/validación/puntuación, 12 de reparto y 18 E2E × 2 viewports (palabra óptima con el solver, palabra más corta, mínimo, palabra inexistente sin cerrar la ronda, corregir, mezclar, rendirse, repetir/siguiente/volver, teclado físico, cuenta atrás, tiempo agotado, progreso, ficha y créditos). Pendiente también: nivel de léxico admitido (`letterRules.maxLexiconTier`, [PENDIENTE]) y rendimiento en móvil.
 
 ## ÉPICA 03 — Llave, duelos y desempate [P0 | Sprints 4–5]
 
@@ -364,6 +365,6 @@ El primer PR con código deberá implementar **solamente una transición de part
 1. **Probar en un dispositivo real** (desbloquea CLY-014/015/065): decidir cuenta EAS y dispositivo/emulador; hacer la build de desarrollo y repetir `Inicio → Juegos → Cifras`.
 2. **Prueba humana de Cifras** (20 ejercicios, CLY-022) y de descubrimiento con 5 personas (UX_FLOWS §8.12).
 3. ~~**CLY-016**: `StorageAdapter` y `FeedbackAdapter`~~ Hecho (progreso local, vibración y ajustes). Faltan sonido original (necesita assets propios con licencia) y `NetworkStatusAdapter` (solo hace falta para el online).
-4. **CLY-023/024**: léxico y La palabra más larga: la segunda prueba `MVP inicial` del catálogo; obliga a cerrar ADR-005 (licencia del léxico).
+4. ~~**CLY-023/024**: léxico y La palabra más larga~~ Hecho en web, de forma provisional (ADR-005 sigue **provisional**). Faltan: elección de vocales en la interfaz, prueba humana de 20 ejercicios, medir carga y memoria del léxico en un móvil real (hoy ~5 MB de texto dentro del bundle), estructura compacta (trie/DAWG) o recurso aparte, y la lista editorial `allow`/`deny` (CLY-062).
 5. **CLY-011 completo**: parser Zod de rulesets y FSM del concurso, antes de CLY-041.
 6. Cerrar los `[PENDIENTE]` de cifras con la matriz de emisiones (CLY-001/002) para poder pasar el ruleset a `VERIFIED`.

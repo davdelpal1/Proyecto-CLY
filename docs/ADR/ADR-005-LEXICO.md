@@ -1,6 +1,6 @@
 # ADR-005 — Léxico de las pruebas de letras
 
-**Estado:** ACEPTADA **provisionalmente** (28/10/2026): el responsable decidió «seguir con Hunspell de momento». Pendiente de revisión jurídica (CLY-071) y de contraste con emisiones (CLY-002).
+**Estado:** ACEPTADA **provisionalmente** (28/10/2026): el responsable decidió «seguir con Hunspell de momento». Pendiente de revisión jurídica (CLY-071) y de contraste con emisiones (CLY-002). Primer uso real: *La palabra más larga* (CLY-024, 28/10/2026).
 **Responsable:** producto/desarrollo
 **Decisión:** usar el diccionario ortográfico **RLA-ES (es_ES, v2.9)**, bajo licencia **MPL 1.1**, como fuente del léxico; compilarlo a una lista local, versionada y con niveles de fiabilidad. Sin APIs externas en tiempo de ejecución.
 
@@ -62,12 +62,12 @@ Cabe holgadamente en el móvil, incluso sin estructura compacta. El 82 % de las 
 
 ## Consecuencias y pendiente
 
-- **Ruleset de letras (CLY-024):** parámetro `allowedLexiconTiers`. Propuesta provisional [DISEÑO]: niveles 0–2 (**337 205** palabras de 5–10 letras); excluir prefijo y pronombre hasta verificarlos con emisiones.
+- **Ruleset de letras (CLY-024):** parámetro `letterRules.maxLexiconTier`, aplicado **provisionalmente** con `SUFFIX_DERIVATION` (niveles 0–2, **337 205** palabras de 5–10 letras, tal como proponía este ADR): prefijo y pronombre pegado quedan fuera hasta verificarlos con emisiones. Figura como [PENDIENTE] en el ruleset y la ficha de la prueba lo dice. **El responsable aún no ha confirmado el nivel**; cambiarlo es una línea en `ruleset.ts` (y subir la revisión).
 - **Capa editorial (CLY-062):** listas `allow` y `deny` propias, revisadas por una persona, con licencia trazable (§13: «léxico + excepciones editorialmente revisadas»). Aquí entrarían `ñu` o `vámonos`.
-- **Formato de empaquetado:** hoy es un `.tsv` de ~3,4 MB. Antes de la beta conviene una estructura compacta (trie/DAWG) y carga diferida; decidir al implementar CLY-024.
+- **Formato de empaquetado (implementado, provisional):** `pnpm lexicon:build` genera además `packages/words-engine/data/es-ES.ts` (≈5 MB, **se versiona**: la app arranca sin pasos previos), con una línea por **forma de ficha** (palabra sin tildes ni diéresis; ver `lexicon-text.ts`): 321 922 formas de 2–10 letras. `pnpm lexicon:check` falla si el módulo no coincide con lo que se generaría desde `third_party/rla-es/` (pensado para CI). En la app se carga con `import()` bajo demanda: en web es un *chunk* aparte de 5,2 MB (solo se descarga al abrir letras); en Android/iOS va dentro del bundle de Hermes. `parseLexicon` no crea un objeto por palabra (texto + índices de posición) y busca con búsqueda binaria; encontrar todas las palabras formables con diez fichas tarda del orden de 5 ms en este equipo. **No medido:** tiempo de carga y memoria en un móvil real. Estructura compacta (trie/DAWG) o recurso aparte, pendientes si la medida lo exige.
 - **Lenguaje de la interfaz:** hablar de «palabra válida en nuestro diccionario». **Nunca** «según la RAE».
-- **Normalización de fichas** (tildes sin ficha propia, `Ñ` ≠ `N`, `Ü`): pendiente, es parte de CLY-023/024.
-- **Obligaciones MPL a mantener:** conservar `NOTICE.txt`, `third_party/rla-es/` y el script de construcción en el repositorio; incluir el aviso en la app (pantalla de licencias) y en las fichas de las tiendas si se pide.
+- **Normalización de fichas** (implementada, [DISEÑO]): las tildes y la diéresis no tienen ficha propia (`toTileKey`), la `Ñ` no equivale a la `N`, y `ü` se forma con la `U`. Cuando dos palabras comparten forma de ficha (`canto`/`cantó`) se guarda la de nivel más fiable; `año` y `ano` sí son distintas. GAME_RULES.md §4 deja la «Ü» como «tratamiento específico» pendiente.
+- **Obligaciones MPL a mantener:** conservar `NOTICE.txt`, `third_party/rla-es/` y el script de construcción en el repositorio; el aviso ya se muestra en la app (Ajustes → «Créditos y licencias»); falta incluirlo en las fichas de las tiendas si se pide.
 - **Revisión jurídica (CLY-071):** esto **no es asesoramiento legal**. El asesor debe validar la elección MPL, que la lista expandida sea una obra derivada, y el origen real de las palabras.
 
 ## Cuándo reabrir esta decisión

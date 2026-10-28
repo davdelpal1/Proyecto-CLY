@@ -114,6 +114,23 @@ export default function Ajustes() {
           </View>
         ) : null}
       </Panel>
+
+      <Panel>
+        <AppText variant="title" heading>
+          Créditos y licencias
+        </AppText>
+        <AppText tone="muted" testID="lexicon-credits">
+          El diccionario de «La palabra más larga» es una versión adaptada del diccionario
+          ortográfico RLA-ES para español (variante es_ES, v2.9), de Santiago Bosio y colaboradores,
+          distribuido bajo la licencia MPL 1.1. Se han expandido sus reglas de afijos, descartado
+          nombres propios y siglas y clasificado cada palabra por fiabilidad. No es el diccionario
+          de la RAE.
+        </AppText>
+        <AppText variant="caption" tone="subtle">
+          Fuente: github.com/LibreOffice/dictionaries (carpeta es). Texto de la licencia y archivos
+          originales en el repositorio del proyecto: third_party/rla-es.
+        </AppText>
+      </Panel>
     </Screen>
   );
 }

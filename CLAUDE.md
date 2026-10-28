@@ -82,7 +82,9 @@ Comandos desde la raíz: `pnpm install`, `pnpm web`, `pnpm validate` (lint + typ
 - **El `Stack` de Expo Router mantiene montada (oculta) la pantalla anterior.** En Playwright, filtrar `getByText(...)` con `.filter({ visible: true })`.
 - **El motor (`numbers-engine`, `game-engine`) no puede leer reloj ni azar** (ESLint lo impide): se inyectan `nowMs` y `RandomSource`. La semilla y el reloj se deciden en `apps/game/src/adapters`.
 - Los paquetes se consumen como TypeScript fuente; no hay paso de build.
-- Los tests E2E resuelven los ejercicios con el propio solver del motor (`apps/game/e2e/helpers.ts`).
+- Los tests E2E resuelven los ejercicios con el propio solver del motor (`apps/game/e2e/helpers.ts`; los de letras, `letters-helpers.ts`, que carga el léxico entero y por eso va aparte).
+- **El léxico es un dato generado y versionado** (`packages/words-engine/data/es-ES.ts`, ~5 MB). No editar a mano: `pnpm lexicon:build` lo regenera y `pnpm lexicon:check` lo verifica. Si cambias `lexicon-tiers.ts`, `lexicon-text.ts`, `tile-letters.ts` o el script, regenera y versiona el módulo. No abras ese archivo en el editor (es una línea de 5 MB).
+- **Escribir ficheros desde Python en Windows convierte LF en CRLF** salvo que se abra con `newline=''`; el repo es LF (`git ls-files --eol`).
 
 ## Primeras tareas
 

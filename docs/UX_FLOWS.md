@@ -155,7 +155,7 @@ Móvil vertical: cabecera compacta (salir, ronda, reloj) → pregunta/tablero (z
 11. La interfaz es **un juego pulido**, con microinteracciones, efectos originales y cambios de escena, pero los derechos de RTVE/Pasapalabra no se dan por adquiridos.
 12. Pruebas de usabilidad: 5 participantes nuevos pueden distinguir Juegos y Concurso sin explicación de un tercero; registrar confusiones.
 
-## 8.1. Estado de implementación (27/10/2026)
+## 8.1. Estado de implementación (28/10/2026)
 
 **Rutas existentes** (`apps/game/app`): `/` (redirige a `/inicio`), `/inicio`, `/juegos`, `/juegos/[prueba]`, `/sesion/entrenamiento`, `/concurso`, `/concurso/contra-ia`, `/ajustes`. **No existen aún:** `/concurso/local`, `/concurso/online`, `/sala/*`, `/partida/[id]`, `/resultado/*`, `/perfil`, `/ayuda`.
 
@@ -166,7 +166,8 @@ Móvil vertical: cabecera compacta (salir, ronda, reloj) → pregunta/tablero (z
 3. **Accesos secundarios.** «Con amigos» y «Estadísticas» salen como etiquetas **no interactivas** «En preparación» (no hay perfil ni «Cómo jugar» global; este último está en cada ficha). «Ajustes» sí existe y es un botón en la cabecera de Inicio.
 4. **Cuenta atrás.** Las pruebas con reloj arrancan con una cuenta atrás de 3 s con el ejercicio oculto (estado «cuenta atrás» de §6), de modo que se cumple «Inicio → Juegos → Cifras → Jugar» en tres interacciones (§8.1). Sin reloj se empieza directamente.
 5. **Catálogo.** Todas las tarjetas abren su ficha; solo las disponibles muestran `JUGAR ›`. Las demás muestran «En preparación» y su ficha lleva un aviso en lugar de botones de jugar. El selector de dificultad no se muestra porque ningún banco lo soporta aún.
-6. **Reglas provisionales visibles.** La ficha de Cifras lista las reglas marcadas [PENDIENTE] (ver `GAME_RULES.md` §1.1).
+6. **Reglas provisionales visibles.** La ficha de Cifras y la de La palabra más larga listan las reglas marcadas [PENDIENTE] (ver `GAME_RULES.md` §1.1).
+7. **La palabra más larga** (28/10/2026) reutiliza el marco de entrenamiento (cuenta atrás, reloj, resultado, Repetir/Siguiente/Volver) con su propio tablero. Una palabra no válida se rechaza **sin cerrar la ronda** (se puede corregir mientras quede tiempo). Mientras llega el diccionario se muestra «Preparando el diccionario…» (y «Reintentar» si falla). Aún no se puede elegir el número de vocales: se reparten al azar entre 3 y 6.
 
 **Criterios de §8**
 
@@ -175,7 +176,7 @@ Móvil vertical: cabecera compacta (salir, ronda, reloj) → pregunta/tablero (z
 | 1 | Máx. 3 interacciones hasta Cifras | ✅ web (E2E) |
 | 2 | Nunca se exige jugar concurso | ✅ |
 | 3 | Sin controles de rival en práctica | ✅ (E2E comprueba que no aparece «rival/IA/oponente») |
-| 4 | 13 modalidades con entrada en catálogo | ✅; solo 1 de 11 habituales funciona (la beta completa exige las 11) |
+| 4 | 13 modalidades con entrada en catálogo | ✅; solo 2 de 11 habituales funcionan (Cifras y La palabra más larga; la beta completa exige las 11) |
 | 5 | Inicio → Concurso contra IA sin registro | ✅ hasta la configuración; **no hay partida** |
 | 6 | El concurso recorre toda la secuencia | ❌ no implementado |
 | 7 | `Repetir` y `Volver a juegos` al terminar | ✅ (además `Siguiente ejercicio`) |

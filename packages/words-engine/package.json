@@ -2,12 +2,13 @@
   "name": "@cly/words-engine",
   "version": "0.1.0",
   "private": true,
-  "description": "Léxico y palabras: clasificación de formas del diccionario por fiabilidad y filtro de palabras jugables. TypeScript puro, sin React, Expo ni DOM.",
+  "description": "Léxico y palabras: clasificación de formas del diccionario por fiabilidad, búsqueda de palabras formables con unas fichas y datos del léxico es-ES (generados). TypeScript puro, sin React, Expo ni DOM.",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./data/es-ES": "./data/es-ES.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
