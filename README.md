@@ -28,8 +28,8 @@ Antigravity se basa en el mismo modelo de editor que VS Code, así que los pasos
 | `pnpm android` / `pnpm ios` | Servidor para móvil. **Sin probar**: Android exige emulador o dispositivo; iOS exige un Mac o una build de EAS |
 | `pnpm lint` | ESLint (incluye reglas de pureza del motor) |
 | `pnpm typecheck` | TypeScript estricto en todo el monorepo |
-| `pnpm test` | Tests unitarios de motor, tokens y lógica de la app (141) |
-| `pnpm test:e2e` | Tests de navegador con Playwright (36: 18 × escritorio y móvil). Levanta el servidor por sí solo |
+| `pnpm test` | Tests unitarios de motor, tokens y lógica de la app (163) |
+| `pnpm test:e2e` | Tests de navegador con Playwright (54: 27 × escritorio y móvil). Levanta el servidor por sí solo |
 | `pnpm format` / `pnpm format:check` | Prettier |
 | `pnpm validate` | `lint` + `typecheck` + `test` + `format:check` |
 | `pnpm build:web` | Exporta la web de producción a `apps/game/dist` |
@@ -53,8 +53,10 @@ Variables de entorno: **ninguna es necesaria** en esta fase (`.env.example` solo
 - **La cifra exacta:** seis fichas y objetivo; operaciones con fichas y resultados encadenables; deshacer y reiniciar; temporizador; confirmar; resultado validado; solución razonada paso a paso; repetir, siguiente ejercicio o volver al catálogo. Teclado físico: `+ − * /`, `Retroceso`, `Esc`, `Enter`.
 - Concurso: elección de modo, configuración contra la IA (nombre, dificultad) y vista previa de las fases derivada del ruleset. **Sin partida.**
 - Ejercicios reproducibles: la semilla va en la URL (`?semilla=…`).
+- **Progreso local** de entrenamiento (jugadas, exactas, racha, exacto más rápido) en la ficha de la prueba, línea de progreso tras cada ronda y «Seguir practicando» en Inicio. Se guarda solo en el dispositivo, sin cuenta; tolera datos corruptos.
+- **Ajustes:** vibración (móvil; no hace nada en web), estado del movimiento reducido y borrado del progreso con confirmación.
 
-**No existe todavía:** partida de concurso, IA, local/online, la llave, letras, duelos, desempate, final, especiales, perfil, ajustes, audio, háptica, persistencia, backend.
+**No existe todavía:** partida de concurso, IA, local/online, la llave, letras, duelos, desempate, final, especiales, perfil, estadísticas globales, audio, backend.
 
 **No comprobado:** ejecución en iOS/Android (los bundles JS de ambos compilan con Metro/Hermes, nada más), VoiceOver/TalkBack, Safari/Firefox, la CI remota.
 

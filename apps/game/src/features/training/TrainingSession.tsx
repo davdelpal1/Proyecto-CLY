@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { spacing } from '@cly/design-tokens';
+import { getPuzzleStats } from '@cly/game-engine';
+import { epochNowMs } from '../../adapters/calendar';
+import { useFeedback } from '../../state/useFeedback';
+import { useProgress } from '../../state/ProgressProvider';
 import { AppText } from '../../components/AppText';
 import { Countdown } from '../../components/Countdown';
 import { GameHeader } from '../../components/GameHeader';
@@ -56,6 +60,32 @@ export function TrainingSession({ seed, timed, onRepeat, onNext, onExit }: Train
 
   const { state, review } = session;
 
+  // Se anota el resultado una sola vez por partida y se da la respuesta táctil acorde.
+  const { progress, record } = useProgress();
+  const feedback = useFeedback();
+  const recorded = useRef(false);
+  useEffect(() => {
+    if (!review || recorded.current) return;
+    recorded.current = true;
+    record({
+      puzzle: 'NUMBER',
+      outcome: review.outcome,
+      elapsedMs: review.elapsedMs,
+      atEpochMs: epochNowMs(),
+    });
+    if (review.outcome === 'EXACT') feedback.success();
+    else if (review.outcome === 'CLOSE') feedback.tap();
+    else if (review.outcome === 'EXPIRED') feedback.error();
+  }, [review, record, feedback]);
+
+  const stats = getPuzzleStats(progress, 'NUMBER');
+  const progressLine =
+    review && stats.played > 0
+      ? stats.currentExactStreak >= 2
+        ? `Racha: ${stats.currentExactStreak} exactas seguidas.`
+        : `Llevas ${stats.exact} ${stats.exact === 1 ? 'exacta' : 'exactas'} en ${stats.played} ${stats.played === 1 ? 'jugada' : 'jugadas'}.`
+      : undefined;
+
   return (
     <Screen>
       <GameHeader
@@ -86,6 +116,7 @@ export function TrainingSession({ seed, timed, onRepeat, onNext, onExit }: Train
       ) : review ? (
         <ResultPanel
           review={review}
+          progressLine={progressLine}
           target={state.puzzle.target}
           onRepeat={onRepeat}
           onNext={onNext}

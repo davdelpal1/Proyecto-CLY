@@ -33,6 +33,15 @@ export type { ExplainedSolution, NumbersOutcome, NumbersReview } from './numbers
 export { scoreNumbersRound } from './numbers-scoring';
 export type { NumbersAward, ValidatedNumbersAnswer } from './numbers-scoring';
 export {
+  EMPTY_PROGRESS,
+  EMPTY_PUZZLE_STATS,
+  getPuzzleStats,
+  parsePracticeProgress,
+  recordPracticeResult,
+  serializePracticeProgress,
+} from './practice-progress';
+export type { PracticeProgress, PracticeResult, PuzzleStats } from './practice-progress';
+export {
   PUZZLE_GROUPS,
   PUZZLE_REGISTRY,
   defaultDurationSeconds,

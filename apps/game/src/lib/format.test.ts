@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatClock, formatDistance, formatDuration, formatSeconds } from './format';
+import { formatAgo, formatClock, formatDistance, formatDuration, formatSeconds } from './format';
 
 describe('formatClock', () => {
   it('redondea hacia arriba para no mostrar 0:00 con tiempo disponible', () => {
@@ -29,6 +29,21 @@ describe('formatDuration', () => {
     expect(formatDuration(180)).toBe('3 min');
     expect(formatDuration(90)).toBe('90 s');
     expect(formatDuration(null)).toBe('Por definir');
+  });
+});
+
+describe('formatAgo', () => {
+  const now = 10 * 24 * 3_600_000;
+  it('escala de "hace un momento" a días', () => {
+    expect(formatAgo(now, now - 30_000)).toBe('hace un momento');
+    expect(formatAgo(now, now - 5 * 60_000)).toBe('hace 5 min');
+    expect(formatAgo(now, now - 3 * 3_600_000)).toBe('hace 3 h');
+    expect(formatAgo(now, now - 30 * 3_600_000)).toBe('ayer');
+    expect(formatAgo(now, now - 4 * 24 * 3_600_000)).toBe('hace 4 días');
+  });
+
+  it('una marca futura (reloj cambiado) no produce textos raros', () => {
+    expect(formatAgo(now, now + 3_600_000)).toBe('hace un momento');
   });
 });
 

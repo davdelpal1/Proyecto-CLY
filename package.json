@@ -8,6 +8,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "start": "pnpm --filter @cly/game start",
     "web": "pnpm --filter @cly/game web",
     "android": "pnpm --filter @cly/game android",
     "ios": "pnpm --filter @cly/game ios",

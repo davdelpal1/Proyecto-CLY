@@ -19,6 +19,7 @@ import { Panel } from '../../components/Panel';
 import { StepList } from '../../components/StepList';
 import { ACTIVE_RULESET } from '../../config/ruleset';
 import { formatDistance } from '../../lib/format';
+import { useFeedback } from '../../state/useFeedback';
 import { useBreakpoint } from '../../theme/useBreakpoint';
 import { REJECTION_MESSAGES } from './messages';
 import type { NumbersSessionApi } from './useNumbersSession';
@@ -37,6 +38,7 @@ const kindOf = (entry: PoolEntry): TileKind =>
  */
 export function NumbersBoard({ session }: { session: NumbersSessionApi }) {
   const { isPhone } = useBreakpoint();
+  const feedback = useFeedback();
   const { state, entries } = session;
   const target = state.puzzle.target;
 
@@ -85,12 +87,17 @@ export function NumbersBoard({ session }: { session: NumbersSessionApi }) {
 
   const onTile = (id: string) => {
     setError(null);
+    feedback.tap();
     if (selectedId === null) return setSelectedId(id);
     if (selectedOp === null) return setSelectedId(id === selectedId ? null : id);
     if (id === selectedId) return setError('Elige un número distinto del primero.');
 
     const code = session.applyStep(selectedId, selectedOp, id);
-    if (code) return setError(REJECTION_MESSAGES[code]);
+    if (code) {
+      feedback.warning();
+      return setError(REJECTION_MESSAGES[code]);
+    }
+    feedback.success();
     // El resultado nuevo queda seleccionado para poder encadenar la siguiente operación.
     setSelectedId(nextResultId(state.steps.length));
     setSelectedOp(null);
@@ -98,17 +105,20 @@ export function NumbersBoard({ session }: { session: NumbersSessionApi }) {
 
   const onOperator = (op: Operator) => {
     setError(null);
+    feedback.tap();
     if (selectedId === null) return setError('Elige primero un número.');
     setSelectedOp(selectedOp === op ? null : op);
   };
 
   const onUndo = () => {
+    feedback.tap();
     const code = session.undo();
     clearSelection();
     if (code) setError(REJECTION_MESSAGES[code]);
   };
 
   const onReset = () => {
+    feedback.tap();
     session.reset();
     clearSelection();
   };

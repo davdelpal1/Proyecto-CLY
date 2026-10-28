@@ -1,12 +1,14 @@
 import { StyleSheet, View } from 'react-native';
 import { colors, spacing } from '@cly/design-tokens';
 import { AppText } from '../src/components/AppText';
+import { Button } from '../src/components/Button';
 import { FadeIn } from '../src/components/FadeIn';
 import { Logo } from '../src/components/Logo';
 import { MainModeCard } from '../src/components/MainModeCard';
 import { Screen } from '../src/components/Screen';
 import { StatusBadge } from '../src/components/StatusBadge';
 import { ContestArt, GamesArt } from '../src/features/home/HomeArt';
+import { ContinueCard } from '../src/features/progress/ContinueCard';
 import { useBreakpoint } from '../src/theme/useBreakpoint';
 
 export default function Inicio() {
@@ -15,7 +17,10 @@ export default function Inicio() {
   return (
     <Screen>
       <FadeIn>
-        <Logo />
+        <View style={styles.top}>
+          <Logo />
+          <Button testID="open-settings" label="Ajustes" variant="ghost" href="/ajustes" />
+        </View>
       </FadeIn>
 
       <FadeIn delay={80}>
@@ -58,6 +63,8 @@ export default function Inicio() {
         </FadeIn>
       </View>
 
+      <ContinueCard />
+
       <FadeIn delay={320}>
         <View style={styles.soon} accessibilityRole="list">
           {['Con amigos', 'Estadísticas'].map((label) => (
@@ -80,6 +87,7 @@ export default function Inicio() {
 }
 
 const styles = StyleSheet.create({
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   hero: { gap: spacing.sm },
   cards: { gap: spacing.lg },
   cardsRow: { flexDirection: 'row', alignItems: 'stretch' },

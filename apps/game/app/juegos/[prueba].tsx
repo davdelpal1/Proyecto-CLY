@@ -19,6 +19,7 @@ import { Screen } from '../../src/components/Screen';
 import { StatusBadge } from '../../src/components/StatusBadge';
 import { ACTIVE_RULESET } from '../../src/config/ruleset';
 import { describePendingField } from '../../src/features/catalog/pending-labels';
+import { ProgressPanel } from '../../src/features/progress/ProgressPanel';
 import { formatDuration } from '../../src/lib/format';
 
 /** Ficha de prueba (UX_FLOWS.md §4): qué hay que hacer, cómo se juega y estado real de disponibilidad. */
@@ -97,6 +98,8 @@ export default function FichaPrueba() {
           <Fact label="Dificultad" value={playable ? 'Única por ahora' : '—'} />
         </View>
       </Panel>
+
+      {playable ? <ProgressPanel puzzle={puzzle.type} /> : null}
 
       {pending.length > 0 || puzzle.ruleStatus === 'PENDING_VERIFICATION' ? (
         <Panel tone="raised">

@@ -157,13 +157,13 @@ Móvil vertical: cabecera compacta (salir, ronda, reloj) → pregunta/tablero (z
 
 ## 8.1. Estado de implementación (27/10/2026)
 
-**Rutas existentes** (`apps/game/app`): `/` (redirige a `/inicio`), `/inicio`, `/juegos`, `/juegos/[prueba]`, `/sesion/entrenamiento`, `/concurso`, `/concurso/contra-ia`. **No existen aún:** `/concurso/local`, `/concurso/online`, `/sala/*`, `/partida/[id]`, `/resultado/*`, `/perfil`, `/ajustes`, `/ayuda`.
+**Rutas existentes** (`apps/game/app`): `/` (redirige a `/inicio`), `/inicio`, `/juegos`, `/juegos/[prueba]`, `/sesion/entrenamiento`, `/concurso`, `/concurso/contra-ia`, `/ajustes`. **No existen aún:** `/concurso/local`, `/concurso/online`, `/sala/*`, `/partida/[id]`, `/resultado/*`, `/perfil`, `/ayuda`.
 
 **Desviaciones deliberadas respecto a este documento**
 
 1. **El resultado individual no es una ruta.** `/resultado/entrenamiento` no existe: el resultado es un estado de `/sesion/entrenamiento`. Motivo: pasar el resultado por URL es frágil y recargar lo perdería. En su lugar, la **semilla viaja en la URL** (`?prueba=cifras&reloj=programa|libre&semilla=…&n=…`): `Repetir` conserva la semilla, `Siguiente ejercicio` pone una nueva y el ejercicio es enlazable. Si en el futuro se necesita una ruta de resultado, el panel (`ResultPanel`) ya es un componente independiente.
 2. **CTA de Concurso.** El wireframe pone `[COMENZAR]`; como la partida no existe, la tarjeta dice `VER CONCURSO` con la etiqueta «Partida en preparación». No se muestra ningún botón que simule empezar.
-3. **Accesos secundarios.** «Con amigos» y «Estadísticas» salen como etiquetas **no interactivas** «En preparación» (no hay ajustes, perfil ni «Cómo jugar» global; este último está en cada ficha).
+3. **Accesos secundarios.** «Con amigos» y «Estadísticas» salen como etiquetas **no interactivas** «En preparación» (no hay perfil ni «Cómo jugar» global; este último está en cada ficha). «Ajustes» sí existe y es un botón en la cabecera de Inicio.
 4. **Cuenta atrás.** Las pruebas con reloj arrancan con una cuenta atrás de 3 s con el ejercicio oculto (estado «cuenta atrás» de §6), de modo que se cumple «Inicio → Juegos → Cifras → Jugar» en tres interacciones (§8.1). Sin reloj se empieza directamente.
 5. **Catálogo.** Todas las tarjetas abren su ficha; solo las disponibles muestran `JUGAR ›`. Las demás muestran «En preparación» y su ficha lleva un aviso en lugar de botones de jugar. El selector de dificultad no se muestra porque ningún banco lo soporta aún.
 6. **Reglas provisionales visibles.** La ficha de Cifras lista las reglas marcadas [PENDIENTE] (ver `GAME_RULES.md` §1.1).
@@ -180,8 +180,8 @@ Móvil vertical: cabecera compacta (salir, ronda, reloj) → pregunta/tablero (z
 | 6 | El concurso recorre toda la secuencia | ❌ no implementado |
 | 7 | `Repetir` y `Volver a juegos` al terminar | ✅ (además `Siguiente ejercicio`) |
 | 8 | `Cómo se juega` antes de cada modalidad | ✅ en la ficha; ❌ desde la pausa (no hay pausa) |
-| 9 | Teclado físico en web / táctil en móvil | ✅ web; táctil emulado, **sin probar en móvil real** |
-| 10 | Audio, haptics y motion ajustables | ⚠ solo movimiento reducido; no hay audio ni haptics |
+| 9 | Teclado físico en web / táctil en móvil | ✅ web; táctil probado a mano por el responsable en un móvil con Expo Go (sin registrar modelo ni sistema) |
+| 10 | Audio, haptics y motion ajustables | ⚠ vibración activable en Ajustes y movimiento reducido (sigue al sistema); **no hay audio**. La vibración se ha implementado pero no he podido comprobarla en un dispositivo |
 | 11 | Interfaz de videojuego pulida | ⚠ identidad propia y microinteracciones básicas; faltan transiciones de ronda y efectos |
 | 12 | Prueba con 5 personas nuevas | ❌ pendiente |
 

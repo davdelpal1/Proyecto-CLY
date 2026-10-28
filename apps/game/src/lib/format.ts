@@ -18,6 +18,17 @@ export function formatDuration(seconds: number | null): string {
   return `${seconds} s`;
 }
 
+/** "hace 5 min", "hace 2 h", "ayer", "hace 3 días". Marcas futuras o muy recientes → "hace un momento". */
+export function formatAgo(nowMs: number, thenMs: number): string {
+  const minutes = Math.floor((nowMs - thenMs) / 60_000);
+  if (minutes < 1) return 'hace un momento';
+  if (minutes < 60) return `hace ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `hace ${hours} h`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? 'ayer' : `hace ${days} días`;
+}
+
 /** Texto de distancia al objetivo para voz y pantalla: "a 12 del objetivo". */
 export function formatDistance(distance: number): string {
   if (distance === 0) return 'justo en el objetivo';

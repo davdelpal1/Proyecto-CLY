@@ -23,13 +23,22 @@ interface ResultPanelProps {
   onRepeat: () => void;
   onNext: () => void;
   onExit: () => void;
+  /** Línea opcional de progreso personal ("Racha: 3 exactas seguidas."). */
+  progressLine?: string | undefined;
 }
 
 /**
  * Resultado individual (UX_FLOWS.md §7): validación, tiempo, solución razonada y las tres salidas
  * obligatorias. No hay puntos de concurso ni rival: es una práctica.
  */
-export function ResultPanel({ review, target, onRepeat, onNext, onExit }: ResultPanelProps) {
+export function ResultPanel({
+  review,
+  progressLine,
+  target,
+  onRepeat,
+  onNext,
+  onExit,
+}: ResultPanelProps) {
   const headline = HEADLINE[review.outcome];
   const { solution } = review;
 
@@ -78,6 +87,12 @@ export function ResultPanel({ review, target, onRepeat, onNext, onExit }: Result
           },
         ]}
       />
+
+      {progressLine ? (
+        <AppText tone="muted" testID="progress-line">
+          {progressLine}
+        </AppText>
+      ) : null}
 
       {review.yourSteps.length > 0 ? (
         <Panel>

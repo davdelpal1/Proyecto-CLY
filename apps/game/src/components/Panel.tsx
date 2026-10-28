@@ -7,12 +7,14 @@ interface PanelProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   tone?: 'default' | 'raised' | 'accent';
+  testID?: string;
 }
 
 /** Superficie base (tarjetas, marcadores, bloques de información). */
-export function Panel({ children, style, tone = 'default' }: PanelProps) {
+export function Panel({ children, style, tone = 'default', testID }: PanelProps) {
   return (
     <View
+      testID={testID}
       style={[
         styles.base,
         tone === 'raised' && styles.raised,

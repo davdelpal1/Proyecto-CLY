@@ -3,7 +3,7 @@
 **Versión:** 1.3 — 27/10/2026  
 **Convención:** `CLY-xxx`, prioridad `P0/P1/P2`, estado inicial `TODO`. Cada épica puede convertirse en lista de Trello y cada subtarea en checklist.
 
-## Estado real del Sprint 1 (27/10/2026)
+## Estado real del Sprint 1 (actualizado 27/10/2026, tras probar en móvil y añadir progreso/ajustes)
 
 `[x]` = hecho y verificado con los comandos indicados · `[ ]` = pendiente. Las notas entre paréntesis dicen qué falta o qué no se ha podido comprobar.
 
@@ -12,9 +12,9 @@
 | CLY-010 | **Hecho en web** | Monorepo pnpm + Expo SDK 58. Build nativa EAS **no** hecha |
 | CLY-011 | Parcial | Tipos, ruleset versionado + snapshot, sesión de cifras con replay. Falta FSM completa y parser Zod |
 | CLY-012 | Parcial | Tokens + componentes base. Faltan pulsador y ficha de letra |
-| CLY-014 | Parcial | Rutas y `app.config.ts`. Faltan builds EAS, sala, ajustes y adaptadores |
+| CLY-014 | Parcial | Rutas (incluidos `/ajustes`) y `app.config.ts`. Probado a mano en móvil con Expo Go. Faltan builds EAS y sala |
 | CLY-015 | Parcial | Vitest + Playwright web. Faltan RNTL, E2E nativo y ADR-009 |
-| CLY-016 | Parcial | `Clock` + reglas ESLint de pureza. Faltan Storage/Feedback/Network |
+| CLY-016 | Parcial | `Clock`, `StorageAdapter`, `FeedbackAdapter` (vibración) + reglas ESLint de pureza. Falta `NetworkStatusAdapter` y sonido |
 | CLY-017 | **Hecho** | Inicio, catálogo de 13 pruebas, ficha, E2E |
 | CLY-018 | Parcial | `TrainingSession` + resultado + Repetir/Siguiente/Volver (solo Cifras) |
 | CLY-019 | Parcial | Configuración contra IA + vista previa de fases. Sin partida |
@@ -22,7 +22,7 @@
 | CLY-021 | Parcial | Solver y generador semillado. Faltan métricas finas y benchmark |
 | CLY-022 | Parcial | Pantalla de cifra exacta jugable. Falta la prueba humana de 20 casos |
 
-**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 141 tests unitarios + formato) y `pnpm test:e2e` (36 tests Playwright en Edge, viewports 1280×800 y 390×844). El bundle de producción web, el de Android y el de iOS compilan con Metro/Hermes; esto **no** equivale a ejecutarlos en un dispositivo.
+**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 163 tests unitarios + formato) y `pnpm test:e2e` (54 tests Playwright en Edge, viewports 1280×800 y 390×844). El bundle de producción web, el de Android y el de iOS compilan con Metro/Hermes; esto **no** equivale a ejecutarlos en un dispositivo.
 **No comprobado:** ejecución en iOS/Android (ni emulador ni dispositivo), TalkBack/VoiceOver, CI remota (el workflow está escrito pero no se ha ejecutado), Safari y Firefox.
 
 ## ÉPICA 00 — Formato, negocio y derechos [P0 | Sprint 0]
@@ -87,24 +87,24 @@
 - **Aceptación:** una partida se guarda y restaura sin inconsistencias.
 
 ### CLY-014 — App universal y primeros builds [P0 | Sprint 1]
-- [ ] Expo Router con rutas de **Inicio ✅, Juegos individuales ✅, Catálogo/Ficha ✅, Entrenamiento ✅, Concurso/Configuración ✅**, sala ❌ y ajustes ❌.
+- [ ] Expo Router con rutas de **Inicio ✅, Juegos individuales ✅, Catálogo/Ficha ✅, Entrenamiento ✅, Concurso/Configuración ✅, Ajustes ✅**, sala ❌.
 - [x] React Native Web; probar un componente de fichas y cronómetro en navegador. (E2E Playwright)
 - [ ] Configuración `app.config.ts` ✅ e identificadores de desarrollo iOS/Android ✅ (`dev.proyectocly.game`, **provisionales**); splash e icono propios ❌.
 - [ ] Crear build de desarrollo Android e iOS con EAS; instalar y probar en dispositivo/emulador y anotar limitaciones de acceso. **BLOQUEADO (decisión del usuario):** requiere cuenta Expo/EAS (posible coste), cuenta Apple Developer para iOS y un dispositivo/emulador. Este equipo no tiene Android SDK/adb ni macOS. Los bundles JS de Android e iOS **sí compilan** con Metro/Hermes (`expo export`), sin ejecutarse.
-- [ ] Abstraer haptics/audio y persistencia con fallback web. (solo hay adaptadores de reloj y de semilla aleatoria)
-- **Aceptación:** misma pantalla Expo funcional en web ✅, Android ❌ e iOS ❌ (bloqueo externo documentado arriba; plan: abrir cuenta EAS → `eas build --profile development` → probar `Inicio → Juegos → Cifras`).
+- [ ] Abstraer haptics/audio y persistencia con fallback web. ✅ persistencia (`StorageAdapter`: localStorage en web, almacén de la app en nativo) y vibración (`FeedbackAdapter`, no-op en web); ❌ audio.
+- **Aceptación:** misma pantalla Expo funcional en web ✅; **en móvil** probada a mano por el responsable con Expo Go (27/10/2026: «todo bien»; falta anotar modelo y sistema operativo); Android ❌ e iOS ❌ como builds de desarrollo EAS (bloqueo externo documentado arriba; plan: abrir cuenta EAS → `eas build --profile development` → probar `Inicio → Juegos → Cifras`).
 
 ### CLY-015 — Pruebas cross-platform automatizadas [P0 | Sprint 1]
-- [ ] Vitest para motor ✅ (134 tests de paquetes + 7 de la app), React Native Testing Library ❌, Playwright para web ✅ (36 tests = 18 × {escritorio, móvil}).
+- [ ] Vitest para motor ✅ (147 tests de paquetes + 16 de la app), React Native Testing Library ❌, Playwright para web ✅ (54 tests = 27 × {escritorio, móvil}).
 - [ ] Elegir estrategia Maestro/Detox en ADR-009 ❌; smoke test nativo de lanzamiento y navegación ❌.
 - [ ] Pruebas de layout con safe area, teclado abierto y texto grande ❌.
 - [ ] CI con pruebas de dominio/UI y build web ✅ (escrito, sin ejecutar); plan de builds nativas periódicas ❌.
 - **Aceptación:** checks repetibles y versiones compatibles ✅ (`expo install --check` y `expo-doctor` 20/20), sin declarar un dispositivo probado: **ninguno** se ha probado.
 
 ### CLY-016 — Contratos y adaptadores de plataforma [P0 | Sprint 1]
-- [ ] Definir `ClockAdapter` ✅ (`Clock` en `game-engine` + `systemClock` en `apps/game/src/adapters`), `StorageAdapter` ❌, `FeedbackAdapter` ❌, `NetworkStatusAdapter` ❌.
+- [ ] Definir `ClockAdapter` ✅ (`Clock` en `game-engine` + `systemClock` en `apps/game/src/adapters`), `StorageAdapter` ✅, `FeedbackAdapter` ✅ (vibración; sin sonido), `NetworkStatusAdapter` ❌.
 - [x] Implementar diferencias web/nativas sin filtrar APIs DOM al motor. (los atajos de teclado son solo web y viven en la app)
-- [ ] Decidir estrategia del modo entrenamiento offline sin recompensas competitivas. (hoy: todo en cliente y sin persistencia; el progreso no se guarda)
+- [x] Decidir estrategia del modo entrenamiento offline sin recompensas competitivas. (todo en cliente; progreso local sin cuenta ni servidor, con borrado desde Ajustes; `practice-progress.ts` es lógica pura y tolera datos corruptos)
 - **Aceptación:** `packages/game-engine` no importa React, Expo ni APIs de navegador ✅ **y está impuesto por ESLint** (también prohíbe `Date.now`, `Math.random`, `performance.now`, `new Date` y `eval` en el motor).
 
 ### CLY-017 — Inicio de videojuego y catálogo de todas las pruebas [P0 | Sprint 1]
@@ -362,7 +362,7 @@ El primer PR con código deberá implementar **solamente una transición de part
 
 1. **Probar en un dispositivo real** (desbloquea CLY-014/015/065): decidir cuenta EAS y dispositivo/emulador; hacer la build de desarrollo y repetir `Inicio → Juegos → Cifras`.
 2. **Prueba humana de Cifras** (20 ejercicios, CLY-022) y de descubrimiento con 5 personas (UX_FLOWS §8.12).
-3. **CLY-016 completo**: `StorageAdapter` (progreso local de entrenamiento) y `FeedbackAdapter` (haptics/sonido con mute).
+3. ~~**CLY-016**: `StorageAdapter` y `FeedbackAdapter`~~ Hecho (progreso local, vibración y ajustes). Faltan sonido original (necesita assets propios con licencia) y `NetworkStatusAdapter` (solo hace falta para el online).
 4. **CLY-023/024**: léxico y La palabra más larga: la segunda prueba `MVP inicial` del catálogo; obliga a cerrar ADR-005 (licencia del léxico).
 5. **CLY-011 completo**: parser Zod de rulesets y FSM del concurso, antes de CLY-041.
 6. Cerrar los `[PENDIENTE]` de cifras con la matriz de emisiones (CLY-001/002) para poder pasar el ruleset a `VERIFIED`.
