@@ -21,8 +21,9 @@
 | CLY-020 | **Hecho** | AST, validador, errores tipados, sin `eval` |
 | CLY-021 | Parcial | Solver y generador semillado. Faltan métricas finas y benchmark |
 | CLY-022 | Parcial | Pantalla de cifra exacta jugable. Falta la prueba humana de 20 casos |
+| CLY-023 | **Parcial (provisional)** | Léxico RLA-ES (Hunspell, MPL 1.1) compilado con niveles de fiabilidad: ADR-005. Falta normalización de fichas, lista editorial y revisión jurídica |
 
-**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 163 tests unitarios + formato) y `pnpm test:e2e` (54 tests Playwright en Edge, viewports 1280×800 y 390×844). El bundle de producción web, el de Android y el de iOS compilan con Metro/Hermes; esto **no** equivale a ejecutarlos en un dispositivo.
+**Validado localmente (Windows 11, Node 24, pnpm 10):** `pnpm validate` (lint + tipos + 178 tests unitarios + formato) y `pnpm test:e2e` (54 tests Playwright en Edge, viewports 1280×800 y 390×844). El bundle de producción web, el de Android y el de iOS compilan con Metro/Hermes; esto **no** equivale a ejecutarlos en un dispositivo.
 **No comprobado:** ejecución en iOS/Android (ni emulador ni dispositivo), TalkBack/VoiceOver, CI remota (el workflow está escrito pero no se ha ejecutado), Safari y Firefox.
 
 ## ÉPICA 00 — Formato, negocio y derechos [P0 | Sprint 0]
@@ -152,11 +153,11 @@
 - **Aceptación:** usuario resuelve/corrige/termina 20 casos sin bloqueo ❌ **pendiente de prueba humana**. Cubierto hoy por E2E (10 semillas distintas, 2 viewports): una resolución exacta de principio a fin con el solver, una aproximación, deshacer/reiniciar, rechazo de división no exacta y de resta no positiva, rendición, repetir/siguiente/volver, cuenta atrás y agotamiento de tiempo.
 
 ### CLY-023 — Léxico y licencias
-- [ ] Seleccionar fuente léxica permisible; documentar licencia y atribución.
-- [ ] Construir normalización Unicode, tildes, ñ, plural y morfología.
-- [ ] Separar palabra candidata de aceptación editorial.
-- [ ] Escribir test de formas raras/ambiguas.
-- **Aceptación:** no se copia un diccionario protegido sin autorización.
+- [x] Seleccionar fuente léxica permisible; documentar licencia y atribución. (RLA-ES es_ES v2.9 bajo MPL 1.1; `docs/ADR/ADR-005-LEXICO.md`, `third_party/rla-es/`. **Provisional**: pendiente de revisión jurídica (CLY-071) y de verificar el origen de las palabras. No hay API oficial de la RAE)
+- [ ] Construir normalización Unicode, tildes, ñ, plural y morfología. (morfología ✅: `pnpm lexicon:build` expande los afijos de Hunspell; normalización para fichas ❌)
+- [ ] Separar palabra candidata de aceptación editorial. (candidata ✅ con 5 niveles de fiabilidad por palabra; la capa editorial `allow`/`deny` ❌, y es necesaria: `ñu`, `vámonos` y `cómpralo` no están en el diccionario)
+- [ ] Escribir test de formas raras/ambiguas. (15 tests de clasificación y filtro con datos sintéticos; faltan casos de formas ambiguas reales)
+- **Aceptación:** no se copia un diccionario protegido sin autorización ✅ (RLA-ES es de licencia abierta; no se usa ni se raspa el DLE).
 
 ### CLY-024 — Motor y pantalla de letras
 - [ ] Distribución de 10 fichas con elección de 3–6 vocales.

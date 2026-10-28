@@ -1,0 +1,19 @@
+{
+  "name": "RLA-ES — diccionario de corrección ortográfica en español (LibreOffice/Apache OpenOffice)",
+  "version": "2.9",
+  "repository": "https://github.com/LibreOffice/dictionaries",
+  "commit": "762abe74008b94b2ff06db6f4024b59a8254c467",
+  "commitDate": "2025-02-13T05:03:31Z",
+  "retrievedOn": "2026-10-28",
+  "pathInRepository": "es/",
+  "variant": "es_ES",
+  "licenseChosen": "MPL-1.1",
+  "licensesOffered": ["GPL-3.0-or-later", "LGPL-3.0-or-later", "MPL-1.1-or-later"],
+  "files": {
+    "es_ES.aff": "e73a9bf8e1383f4986a5dc9e2fbed49371c0c61f511c626d15586bd433c1cad9",
+    "es_ES.dic": "6975dddec3d5d2c676069537bc67b4b5f786c65c5d4cf6703a82acf779ac9ec1",
+    "README_hunspell_es.txt": "0b5c39a863ecb61f5c5631ec1cd977667ef9bda6da6f90e80e9fc0edcbfadd97",
+    "LICENSE.md": "2b70fd5cb8d3b34cc6ae322c969557a2270b99017594addb2531ef5ffd9e1b17",
+    "MPL-1.1.txt": "53692a2ed6c6a2c6ec9b32dd0b820dfae91e0a1fcdf625ca9ed0bdf8705fcc4f"
+  }
+}

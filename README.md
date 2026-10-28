@@ -14,7 +14,7 @@ La paridad exacta con RTVE está condicionada a verificar reglas aún abiertas, 
 
 Antigravity se basa en el mismo modelo de editor que VS Code, así que los pasos son los habituales. **No se han ejecutado dentro de Antigravity**; sí se han ejecutado en una terminal de Windows 11.
 
-**Requisitos:** Node.js ≥ 22 (probado con 24.11), pnpm **10** y, para los tests E2E, Edge o Chrome instalado.
+**Requisitos:** Node.js ≥ 22.18 (probado con 24.11), pnpm **10** y, para los tests E2E, Edge o Chrome instalado.
 
 1. Abre la carpeta del proyecto: *File → Open Folder…* y elige la raíz (donde está `package.json`).
 2. Abre la terminal integrada (`` Ctrl+` ``).
@@ -28,9 +28,10 @@ Antigravity se basa en el mismo modelo de editor que VS Code, así que los pasos
 | `pnpm android` / `pnpm ios` | Servidor para móvil. **Sin probar**: Android exige emulador o dispositivo; iOS exige un Mac o una build de EAS |
 | `pnpm lint` | ESLint (incluye reglas de pureza del motor) |
 | `pnpm typecheck` | TypeScript estricto en todo el monorepo |
-| `pnpm test` | Tests unitarios de motor, tokens y lógica de la app (163) |
+| `pnpm test` | Tests unitarios de motor, léxico, tokens y lógica de la app (178) |
 | `pnpm test:e2e` | Tests de navegador con Playwright (54: 27 × escritorio y móvil). Levanta el servidor por sí solo |
 | `pnpm format` / `pnpm format:check` | Prettier |
+| `pnpm lexicon:build` | Genera el léxico de palabras en `.lexicon-build/` a partir del diccionario de `third_party/rla-es/` (sin red; determinista) |
 | `pnpm validate` | `lint` + `typecheck` + `test` + `format:check` |
 | `pnpm build:web` | Exporta la web de producción a `apps/game/dist` |
 
@@ -72,7 +73,10 @@ apps/
 packages/
   numbers-engine/  AST, validador, aritmética racional exacta, solver, generador semillado
   game-engine/     ruleset versionado, sesión de cifras reproducible, puntuación, registro de 13 pruebas, secuencia de concurso
+  words-engine/    clasificación del léxico por fiabilidad y filtro de palabras jugables
   design-tokens/   color, tipografía, espaciado, movimiento
+scripts/lexicon/   construcción del léxico (CLY-023)
+third_party/       diccionario RLA-ES original, sin modificar (licencia MPL 1.1)
 docs/              documentación de producto y arquitectura
 ```
 

@@ -127,8 +127,10 @@ project-cly/
 | `packages/numbers-engine` | **Implementado:** AST (`ExpressionTree`), aritmética racional exacta, validador, replay de pasos, solver, generador semillado |
 | `packages/game-engine` | **Parcial:** ruleset + snapshot con hash, RNG semillado, sesión de cifras (acciones/eventos/replay), puntuación de cifras, `PuzzleRegistry` (13), secuencia del concurso, progreso de entrenamiento (`practice-progress.ts`, puro, con parseo defensivo) |
 | `apps/game/src/adapters` | `systemClock` (monotónico), `deviceStorage` (AsyncStorage: localStorage en web), `deviceFeedback` (vibración con `expo-haptics`; no-op en web), `newExerciseSeed`, `epochNowMs` |
+| `packages/words-engine` | **Parcial:** clasificación de formas del diccionario por fiabilidad y filtro de palabras jugables. Falta normalización de fichas y validación de palabras |
+| `third_party/rla-es/` + `scripts/lexicon/` | Diccionario RLA-ES original (sin modificar, con huellas) y script determinista que genera el léxico (`pnpm lexicon:build`). Ver ADR-005 |
 | `packages/design-tokens` | **Implementado:** color (con test de contraste), tipografía, espaciado, movimiento, breakpoints |
-| `contracts`, `words-engine`, `content-schemas`, `test-fixtures`, `testing`, `db/`, `scripts/` | **No creados**: se crearán cuando un ticket los necesite (no hay archivos vacíos) |
+| `contracts`, `content-schemas`, `test-fixtures`, `testing`, `db/` | **No creados**: se crearán cuando un ticket los necesite (no hay archivos vacíos) |
 
 Decisiones tomadas al implementar:
 
@@ -242,7 +244,7 @@ Acceso con RLS/servidor según tipo de dato. No distribuir claves de administrac
 - `ADR-002`: autenticación (Supabase Auth elegido provisionalmente).
 - `ADR-003`: Socket.IO versus WebSocket nativo.
 - `ADR-004`: reglas versionadas y evidencia del formato.
-- `ADR-005`: licencia del lexicón.
+- `ADR-005`: léxico y su licencia — **aceptada provisionalmente** (`ADR/ADR-005-LEXICO.md`): RLA-ES/Hunspell bajo MPL 1.1.
 - `ADR-006`: identidad, licencia y protección del formato.
 - **`ADR-007`: Expo/React Native versus Unity/Godot (decisión vigente).**
 - `ADR-008` (pendiente): estilo e implementación de animaciones, NativeWind versus StyleSheet.

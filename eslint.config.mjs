@@ -50,7 +50,11 @@ export default tseslint.config(
 
   // Paquetes de dominio puro: sin UI, sin plataforma, sin reloj ni azar implícitos.
   {
-    files: ['packages/numbers-engine/src/**/*.ts', 'packages/game-engine/src/**/*.ts'],
+    files: [
+      'packages/numbers-engine/src/**/*.ts',
+      'packages/game-engine/src/**/*.ts',
+      'packages/words-engine/src/**/*.ts',
+    ],
     ignores: ['**/*.test.ts', '**/test-helpers.ts'],
     languageOptions: { globals: { ...globals.es2021 } },
     rules: {

@@ -1,0 +1,16 @@
+{
+  "name": "@cly/words-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Léxico y palabras: clasificación de formas del diccionario por fiabilidad y filtro de palabras jugables. TypeScript puro, sin React, Expo ni DOM.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  }
+}

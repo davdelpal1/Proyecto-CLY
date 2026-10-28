@@ -32,3 +32,4 @@ apps/game/playwright-report/
 *.tsbuildinfo
 .DS_Store
 npm-debug.*
+.lexicon-build/

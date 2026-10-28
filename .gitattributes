@@ -1,0 +1,3 @@
+# Los archivos de terceros se guardan byte a byte: sin conversión de saltos de línea.
+# (core.autocrlf=true en Windows los alteraría y cambiaría sus huellas SHA-256.)
+third_party/** -text

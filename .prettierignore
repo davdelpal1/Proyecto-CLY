@@ -8,3 +8,4 @@ apps/game/test-results
 apps/game/playwright-report
 # La documentación se mantiene a mano
 *.md
+third_party
